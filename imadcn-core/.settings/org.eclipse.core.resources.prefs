@@ -1,0 +1,4 @@
+eclipse.preferences.version=1
+encoding//src/main/resources/environment/coreconfig.properties=UTF-8
+encoding//src/main/resources/environment/coreconfig_dev.properties=UTF-8
+encoding//src/main/resources/environment/coreconfig_test.properties=UTF-8

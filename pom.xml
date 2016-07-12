@@ -79,6 +79,10 @@
 		<org.apache.mina.version>2.0.13</org.apache.mina.version>
 		<!-- httpclient -->
 		<org.apache.httpclient.version>4.3.3</org.apache.httpclient.version>
+		<!-- captcha -->
+		<com.github.penggle.kaptcha.version>2.3.2</com.github.penggle.kaptcha.version>
+		<!-- sharding jdbc -->
+		<com.dangdang.sharding-jdbc.version>1.1.0</com.dangdang.sharding-jdbc.version>
 	</properties>
 
 	<dependencyManagement>
@@ -480,27 +484,31 @@
 			</dependency>
 
 			<!-- mina -->
-<!-- 			<dependency>
-				<groupId>org.apache.mina</groupId>
-				<artifactId>mina-core</artifactId>
-				<version>${org.apache.mina.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.mina</groupId>
-				<artifactId>mina-http</artifactId>
-				<version>${org.apache.mina.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.mina</groupId>
-				<artifactId>mina-filter-compression</artifactId>
-				<version>${org.apache.mina.version}</version>
-			</dependency> -->
+			<!-- <dependency> <groupId>org.apache.mina</groupId> <artifactId>mina-core</artifactId> 
+				<version>${org.apache.mina.version}</version> </dependency> <dependency> 
+				<groupId>org.apache.mina</groupId> <artifactId>mina-http</artifactId> <version>${org.apache.mina.version}</version> 
+				</dependency> <dependency> <groupId>org.apache.mina</groupId> <artifactId>mina-filter-compression</artifactId> 
+				<version>${org.apache.mina.version}</version> </dependency> -->
 
 			<!-- httpclient -->
 			<dependency>
 				<groupId>org.apache.httpclient</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>${org.apache.httpclient.version}</version>
+			</dependency>
+
+			<!-- captcha -->
+			<dependency>
+				<groupId>com.github.penggle</groupId>
+				<artifactId>kaptcha</artifactId>
+				<version>${com.github.penggle.kaptcha.version}</version>
+			</dependency>
+
+			<!-- sharding jdbc -->
+			<dependency>
+				<groupId>com.dangdang</groupId>
+				<artifactId>sharding-jdbc-core</artifactId>
+				<version>${com.dangdang.sharding-jdbc.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
