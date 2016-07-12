@@ -185,6 +185,10 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -334,17 +338,7 @@
 			<groupId>com.taobao.pamirs.schedule</groupId>
 			<artifactId>tbschedule</artifactId>
 		</dependency>
-
-		<!-- mina -->
-		<dependency>
-			<groupId>org.apache.mina</groupId>
-			<artifactId>mina-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.mina</groupId>
-			<artifactId>mina-http</artifactId>
-		</dependency>
-
+		
 		<!-- httpclient -->
 		<dependency>
 			<groupId>org.apache.httpclient</groupId>
