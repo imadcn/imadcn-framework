@@ -510,6 +510,11 @@
 				<artifactId>sharding-jdbc-core</artifactId>
 				<version>${com.dangdang.sharding-jdbc.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.dangdang</groupId>
+				<artifactId>sharding-jdbc-config-spring</artifactId>
+				<version>${com.dangdang.sharding-jdbc.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 </project>

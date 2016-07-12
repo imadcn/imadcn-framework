@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+	</settings>
+	
+	<!-- 别名 -->
+<!-- 	<typeAliases>
+		<typeAlias alias="Logistics" 			type="com.sztx.logistics.dataaccess.domain.Logistics" />
+		<typeAlias alias="LogisticsDetail" 		type="com.sztx.logistics.dataaccess.domain.LogisticsDetail" />
+		<typeAlias alias="LogisticsType" 		type="com.sztx.logistics.dataaccess.domain.LogisticsType" />
+	</typeAliases> -->
+		
+	<plugins>
+    	<plugin interceptor="com.github.pagehelper.PageHelper" />
+	</plugins>
+	
+</configuration> 

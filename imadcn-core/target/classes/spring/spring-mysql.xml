@@ -10,7 +10,7 @@
                         http://www.dangdang.com/schema/ddframe/rdb 
                         http://www.dangdang.com/schema/ddframe/rdb/rdb.xsd 
                         ">
-    <context:property-placeholder location="classpath:**.properties" ignore-unresolvable="true"/>
+    <context:property-placeholder location="classpath:**.properties"/>
 
     <bean id="dbtbl_0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db1.jdbc.driverClassName}"/>
