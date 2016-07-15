@@ -338,19 +338,19 @@
 			<groupId>com.taobao.pamirs.schedule</groupId>
 			<artifactId>tbschedule</artifactId>
 		</dependency>
-		
+
 		<!-- httpclient -->
 		<dependency>
 			<groupId>org.apache.httpclient</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
-		
+
 		<!-- captcha -->
 		<dependency>
 			<groupId>com.github.penggle</groupId>
 			<artifactId>kaptcha</artifactId>
 		</dependency>
-		
+
 		<!-- sharding jdbc -->
 		<dependency>
 			<groupId>com.dangdang</groupId>
