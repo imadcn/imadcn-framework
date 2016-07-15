@@ -1,5 +1,5 @@
 package com.imadcn.framework.qrcode;
 
-public interface IQrCode {
+public interface QrCode {
 
 }

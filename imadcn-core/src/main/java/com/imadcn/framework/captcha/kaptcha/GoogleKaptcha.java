@@ -10,9 +10,9 @@ import javax.imageio.ImageIO;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
-import com.imadcn.framework.captcha.ICaptcha;
+import com.imadcn.framework.captcha.Captcha;
 
-public class GoogleKaptcha implements ICaptcha {
+public class GoogleKaptcha implements Captcha {
 	
 	private DefaultKaptcha defaultKaptcha;
 	
@@ -101,13 +101,15 @@ public class GoogleKaptcha implements ICaptcha {
 	
 	public static void main(String[] args) {
 		GoogleKaptcha kaptcha = new GoogleKaptcha();
-		kaptcha.save(8, CaptchaType.LATIN);
+		for (int i = 0; i < 10; i++) {
+			kaptcha.save(8, CaptchaType.CHINESE);
+		}
 	}
 	
 	private Properties getDefaultProperties() {
 		Properties properties = new Properties();
 		properties.put(Constants.KAPTCHA_BORDER, "no");
-		properties.put(Constants.KAPTCHA_TEXTPRODUCER_FONT_COLOR, "red");
+		properties.put(Constants.KAPTCHA_TEXTPRODUCER_FONT_COLOR, "blue");
 		properties.put(Constants.KAPTCHA_IMAGE_WIDTH, "400");
 		properties.put(Constants.KAPTCHA_IMAGE_HEIGHT, "80");
 		properties.put(Constants.KAPTCHA_TEXTPRODUCER_FONT_SIZE, "32");

@@ -1,4 +1,4 @@
 package com.imadcn.framework.captcha;
 
-public interface ICaptcha {
+public interface Captcha {
 }
