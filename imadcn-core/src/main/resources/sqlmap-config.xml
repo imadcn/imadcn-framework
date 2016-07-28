@@ -14,9 +14,6 @@
 		<typeAlias alias="LogisticsDetail" 		type="com.sztx.logistics.dataaccess.domain.LogisticsDetail" />
 		<typeAlias alias="LogisticsType" 		type="com.sztx.logistics.dataaccess.domain.LogisticsType" />
 	</typeAliases> -->
-		
-	<plugins>
-    	<plugin interceptor="com.github.pagehelper.PageHelper" />
-	</plugins>
 	
 </configuration> 
+ 
