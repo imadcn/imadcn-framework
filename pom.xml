@@ -84,6 +84,8 @@
 		<com.github.penggle.kaptcha.version>2.3.2</com.github.penggle.kaptcha.version>
 		<!-- sharding jdbc -->
 		<com.dangdang.sharding-jdbc.version>1.1.0</com.dangdang.sharding-jdbc.version>
+		<!-- redisson -->
+		<org.redisson.version>2.2.9</org.redisson.version>
 	</properties>
 
 	<dependencyManagement>
@@ -515,6 +517,13 @@
 				<groupId>com.dangdang</groupId>
 				<artifactId>sharding-jdbc-config-spring</artifactId>
 				<version>${com.dangdang.sharding-jdbc.version}</version>
+			</dependency>
+			
+			<!-- redisson -->
+			<dependency>
+				<groupId>org.redisson</groupId>
+				<artifactId>redisson</artifactId>
+				<version>${org.redisson.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -280,9 +280,9 @@ public class RedEnvelopeV1 {
 	}
 	
 	public static void main(String[] args) {
-		BigDecimal[] rsp = RedEnvelopeV1.calculate("83.13", "10");
-		BigDecimal[] sorted = sort(rsp);
-		for (BigDecimal r : sorted) {
+		BigDecimal[] rsp = RedEnvelopeV1.calculate("83.13", "11");
+		// BigDecimal[] sorted = sort(rsp);
+		for (BigDecimal r : rsp) {
 			System.err.println(r);
 		}
 	}
