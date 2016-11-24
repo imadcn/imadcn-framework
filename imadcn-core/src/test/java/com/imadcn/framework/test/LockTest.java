@@ -9,8 +9,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
-import com.imadcn.framework.locks.RedisLockManager;
-import com.imadcn.framework.locks.ReentrantRedisLock;
+import com.imadcn.framework.redis.lock.RedisLockManager;
+import com.imadcn.framework.redis.lock.ReentrantRedisLock;
 import com.imadcn.framework.util.DateFormatUtil;
 import com.imadcn.framework.util.UIDUtil;
 

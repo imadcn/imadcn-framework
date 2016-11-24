@@ -1,4 +1,4 @@
-package com.imadcn.framework.locks;
+package com.imadcn.framework.redis.lock;
 
 import java.util.UUID;
 

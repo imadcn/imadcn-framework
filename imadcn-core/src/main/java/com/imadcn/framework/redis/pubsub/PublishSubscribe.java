@@ -1,4 +1,4 @@
-package com.imadcn.framework.locks;
+package com.imadcn.framework.redis.pubsub;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,15 +15,15 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  * 发布订阅工具
  * @author imadcn
  */
-public abstract class PublishSubscribe<E extends LockEntry> {
+public abstract class PublishSubscribe<E extends PubSubEntry<E>> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PublishSubscribe.class);
 	
 	private final ConcurrentMap<String, E> entries =  new ConcurrentHashMap<String, E>(); // 锁资源监听
-    private static final ConcurrentMap<String, MessageListener> LISTENER_MAP = new ConcurrentHashMap<String, MessageListener>(); // 监听器map
+    private final ConcurrentMap<String, MessageListener> LISTENER_MAP = new ConcurrentHashMap<String, MessageListener>(); // 监听器map
     
     /**
-     * 获取锁事件实例
+     * 获取事件实例
      * @param entryName
      * @return
      */
@@ -42,22 +42,22 @@ public abstract class PublishSubscribe<E extends LockEntry> {
     	synchronized (this) {
             E entry = entries.get(entryName);
             if (entry != null) {
-                entry.aquire();
+                entry.acquire();
                 return entry;
             }
 
             E value = createEntry(channelName);
-            value.aquire();
+            value.acquire();
 
             E oldValue = entries.putIfAbsent(entryName, value);
             if (oldValue != null) {
-                oldValue.aquire();
+                oldValue.acquire();
                 return entry;
             }
             
     		MessageListener listener = creatMessageListener(channelName, value); // 创建监听器
     		if (LISTENER_MAP.putIfAbsent(entryName, listener) == null) {
-    			LOGGER.info("message listener added with entry name [{}], channel name [{}]", entryName, channelName);
+    			LOGGER.debug("message listener added with entry name [{}], channel name [{}]", entryName, channelName);
     			container.addMessageListener(listener, new ChannelTopic(channelName));
     		}
     		return value;
@@ -70,14 +70,13 @@ public abstract class PublishSubscribe<E extends LockEntry> {
 	 * @param entryName
 	 * @param container
 	 */
-	public void unsubscribe(LockEntry entry, String entryName, RedisMessageListenerContainer container) {
+	public void unsubscribe(E entry, String entryName, RedisMessageListenerContainer container) {
 		synchronized (this) {
             if (entry.release() == 0) {
                 boolean removed = entries.remove(entryName) == entry;
                 if (removed) {
                 	MessageListener listener = LISTENER_MAP.remove(entryName);
             		if (listener != null) {
-            			LOGGER.debug("message listener removed with entry-thread: {}", entry.getTag());
             			container.removeMessageListener(listener);
             		}
                 }
@@ -106,7 +105,7 @@ public abstract class PublishSubscribe<E extends LockEntry> {
 	}
 	
 	/**
-	 * 创建锁资源监听订阅实例
+	 * 创建资源监听订阅实例
 	 * @param channelName
 	 * @return
 	 */

@@ -1,13 +1,15 @@
-package com.imadcn.framework.locks;
+package com.imadcn.framework.redis.lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.imadcn.framework.redis.pubsub.PublishSubscribe;
 
 /**
  * 基于redis发布订阅功能，实现锁资源释放监听
  * @author imadcn
  */
-public class LockPubSub extends PublishSubscribe<LockEntry> {
+public class LockPubSub extends PublishSubscribe<RedisLockEntry> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(LockPubSub.class);
 
@@ -17,7 +19,7 @@ public class LockPubSub extends PublishSubscribe<LockEntry> {
 	public static final Long UNLOCK_PUBSUB_MESSAGE = 0L; // 
 
 	@Override
-	public void onMessage(LockEntry value, Object message) {
+	public void onMessage(RedisLockEntry value, Object message) {
 		if (message.equals(UNLOCK_PUBSUB_MESSAGE + "")) {
 			LOGGER.debug("[{}] released, latch id [{}]", value.getTag(), value.getLatch());
 			value.getLatch().release(); // unlock
@@ -25,7 +27,7 @@ public class LockPubSub extends PublishSubscribe<LockEntry> {
 	}
 
 	@Override
-	protected LockEntry createEntry(String channelName) {
-		return new LockEntry(channelName);
+	protected RedisLockEntry createEntry(String channelName) {
+		return new RedisLockEntry(channelName);
 	}
 }

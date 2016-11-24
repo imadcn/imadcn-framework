@@ -11,8 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.imadcn.framework.locks.RedisLockManager;
-import com.imadcn.framework.locks.ReentrantRedisLock;
+import com.imadcn.framework.redis.lock.RedisLockManager;
+import com.imadcn.framework.redis.lock.ReentrantRedisLock;
 import com.imadcn.framework.util.UIDUtil;
 
 public class RedisLockTest {

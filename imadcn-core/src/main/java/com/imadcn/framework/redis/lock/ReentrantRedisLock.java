@@ -1,4 +1,4 @@
-package com.imadcn.framework.locks;
+package com.imadcn.framework.redis.lock;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  * 可重入的分布式锁, 基于redis
  * @author imadcn
  */
-public class ReentrantRedisLock implements Serializable  {
+public class ReentrantRedisLock implements Lock, Serializable  {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReentrantRedisLock.class);
 
@@ -47,9 +48,7 @@ public class ReentrantRedisLock implements Serializable  {
 		this.uuid = uuid;
 	}
 	
-	/**
-	 * 锁定
-	 */
+	@Override
 	public void lock() {
 		try {
 			lockInterruptibly(DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
@@ -58,28 +57,29 @@ public class ReentrantRedisLock implements Serializable  {
 		}
 	}
 	
-	/**
-	 * 可能会中断的锁定操作
-	 * @throws InterruptedException
-	 */
+	@Override
 	public void lockInterruptibly() throws InterruptedException {
 		lockInterruptibly(DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
 	}
 	
-	public void tryLock() {
+	@Override
+	public boolean tryLock() {
 		try {
-			tryLock(-1, DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
+			return tryLock(-1, DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+		return false;
 	}
 	
-	public void tryLock(long waitTime, TimeUnit unit) throws InterruptedException {
+	@Override
+	public boolean tryLock(long waitTime, TimeUnit unit) throws InterruptedException {
 		try {
-			tryLock(waitTime, DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
+			return tryLock(waitTime, DEFAULT_LEASE_TIME, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+		return false;
 	}
 	
 	/**
@@ -93,14 +93,14 @@ public class ReentrantRedisLock implements Serializable  {
 		if (ttl == null) { // lock acquired
 			return;
 		}
-		LockEntry subscribeEntry = subscribe(); // 添加pubsub功能，监听解锁时间
+		RedisLockEntry subscribeEntry = subscribe(); // 添加pubsub功能，监听解锁时间
 		try {
 			while(true) {
 				ttl = tryAcquire(leaseTime, unit);
 				if (ttl == null) { // lock acquired
 					break;
 				}
-				LockEntry entry = PUBSUB.getEntry(getEntryName()); // 用于触发解锁事件操作的实例
+				RedisLockEntry entry = PUBSUB.getEntry(getEntryName()); // 用于触发解锁事件操作的实例
 				LOGGER.debug("[{}] get entry", entry.getTag());
 				if (ttl >= 0) {
 					LOGGER.debug("[{}] acquire with tll {} ms, latch id [{}]", entry.getTag(), ttl, entry.getLatch());
@@ -115,7 +115,6 @@ public class ReentrantRedisLock implements Serializable  {
 			unsubscribe(subscribeEntry); // 等他他人解锁，切自己锁定成功，取消监听解锁事件
 		}
 	}
-
 	
 	/**
 	 * 尝试锁定，如果获取到锁则立马返回true，否则持续等待，直至等待超时，并返回false
@@ -134,7 +133,7 @@ public class ReentrantRedisLock implements Serializable  {
 		if (time <= 0) {
 			return false;
 		}
-		LockEntry subscribeEntry = subscribe();
+		RedisLockEntry subscribeEntry = subscribe();
 		try {
 			while(true) {
 				ttl = tryAcquire(leaseTime, unit);
@@ -147,7 +146,7 @@ public class ReentrantRedisLock implements Serializable  {
 				
 				// waiting for message
                 long current = System.currentTimeMillis();
-                LockEntry entry = PUBSUB.getEntry(getEntryName());
+                RedisLockEntry entry = PUBSUB.getEntry(getEntryName());
                 
                 if (ttl >= 0 && ttl < time) { // 前一资源剩余生命周期 和 自己等待时间，以最短的作为锁定时间
                     entry.getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
@@ -164,9 +163,7 @@ public class ReentrantRedisLock implements Serializable  {
 		
 	}
 
-	/**
-	 * 解锁
-	 */
+	@Override
 	public void unlock() { 
 		Long eval = redisTemplate.execute(new RedisCallback<Long>() {
 			public Long doInRedis(RedisConnection connection) throws DataAccessException {
@@ -180,6 +177,11 @@ public class ReentrantRedisLock implements Serializable  {
 		if (eval == 1) { // 解锁成功，取消生命周期时常刷新task
 			cancelExpirationRenewal();
 		}
+	}
+	
+	@Override
+	public Condition newCondition() {
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -271,7 +273,7 @@ public class ReentrantRedisLock implements Serializable  {
 	 * 添加解锁监听事件
 	 * @return
 	 */
-	private LockEntry subscribe() { 
+	private RedisLockEntry subscribe() { 
 		return PUBSUB.subscribe(getEntryName(), getChannelName(), container);
 	}
 	
@@ -279,7 +281,7 @@ public class ReentrantRedisLock implements Serializable  {
 	 * 解除监听
 	 * @param subscribeEntry
 	 */
-	private void unsubscribe(LockEntry subscribeEntry) { 
+	private void unsubscribe(RedisLockEntry subscribeEntry) { 
 		PUBSUB.unsubscribe(subscribeEntry, getEntryName(), container);
 	}
 	
@@ -303,10 +305,6 @@ public class ReentrantRedisLock implements Serializable  {
 		this.redisTemplate = redisTemplate;
 	}
 
-	public Condition newCondition() {
-		throw new UnsupportedOperationException();
-	}
-	
 	@SuppressWarnings("unchecked")
 	protected RedisSerializer<Object> getKeySerializer() {
 		return (RedisSerializer<Object>) redisTemplate.getKeySerializer();
