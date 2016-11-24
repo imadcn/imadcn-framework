@@ -12,6 +12,9 @@
 	</modules>
 
 	<properties>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+	
 		<!-- servlet -->
 		<javax.servlet.servlet-api.version>3.1.0</javax.servlet.servlet-api.version>
 		<javax.servlet.jsp-api.version>2.2</javax.servlet.jsp-api.version>
@@ -494,11 +497,11 @@
 				<version>${org.apache.mina.version}</version> </dependency> -->
 
 			<!-- httpclient -->
-			<dependency>
+<!-- 			<dependency>
 				<groupId>org.apache.httpclient</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>${org.apache.httpclient.version}</version>
-			</dependency>
+			</dependency> -->
 
 			<!-- captcha -->
 			<dependency>

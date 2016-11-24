@@ -76,7 +76,7 @@ public class RedisLockTest {
 			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
-			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
+			LOGGER.info(String.format("key [{}] locked in thread id [{}]. try to sleep [{}] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
@@ -87,7 +87,7 @@ public class RedisLockTest {
 			synchronized (counter) {
 				counter++;
 			}
-			LOGGER.info(String.format("key [%s] unlocked in thread id [%s].", key, threadId));
+			LOGGER.info(String.format("key [{}] unlocked in thread id [{}].", key, threadId));
 		} catch (Exception e) {
 			e.printStackTrace();
 			exceptions.add(e);
@@ -115,7 +115,7 @@ public class RedisLockTest {
 			long sleepElapse = 0; //50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
-			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
+			LOGGER.info(String.format("key [{}] locked in thread id [{}]. try to sleep [{}] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
@@ -126,7 +126,7 @@ public class RedisLockTest {
 			synchronized (counter) {
 				counter++;
 			}
-			LOGGER.info(String.format("key [%s] unlocked in thread id [%s].", key, threadId));
+			LOGGER.info(String.format("key [{}] unlocked in thread id [{}].", key, threadId));
 		} catch (Exception e) {
 			e.printStackTrace();
 			exceptions.add(e);

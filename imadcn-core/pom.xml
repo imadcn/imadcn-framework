@@ -340,12 +340,12 @@
 		</dependency>
 
 		<!-- httpclient -->
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.apache.httpclient</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
 
-		<!-- captcha -->
+ -->		<!-- captcha -->
 		<dependency>
 			<groupId>com.github.penggle</groupId>
 			<artifactId>kaptcha</artifactId>
