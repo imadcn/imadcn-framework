@@ -10,7 +10,7 @@
                         http://www.dangdang.com/schema/ddframe/rdb 
                         http://www.dangdang.com/schema/ddframe/rdb/rdb.xsd 
                         ">
-    <context:property-placeholder location="classpath:corecofig.properties"/>
+    <context:property-placeholder location="classpath:corecofig_dev.properties"/>
 
     <bean id="db_node_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db1.jdbc.driverClassName}"/>
