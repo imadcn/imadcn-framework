@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="${scan:-true}" scanPeriod="${scanPeriod:-60 second}" debug="false">
-	<property resource="config.properties" />
+	<property resource="environment/config.properties" />
 	<contextName>order</contextName>
-
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->

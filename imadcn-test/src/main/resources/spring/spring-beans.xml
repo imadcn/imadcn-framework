@@ -8,11 +8,11 @@
 	<!-- thread pool task executor -->
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<!-- 核心线程数，默认为1 -->
-		<property name="corePoolSize" value="5" />
+		<property name="corePoolSize" value="30" />
 		<!-- 最大线程数，默认为Integer.MAX_VALUE -->
-		<property name="maxPoolSize" value="10" />
+		<property name="maxPoolSize" value="50" />
 		<!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
-		<property name="queueCapacity" value="1000" />
+		<property name="queueCapacity" value="20000" />
 		<!-- 线程池维护线程所允许的空闲时间，默认为60s -->
 		<property name="keepAliveSeconds" value="1" />
 	</bean>
