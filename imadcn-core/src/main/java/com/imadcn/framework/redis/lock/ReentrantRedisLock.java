@@ -20,6 +20,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import com.imadcn.framework.redis.pubsub.LockPubSub;
+
 /**
  * 可重入的分布式锁, 基于redis
  * @author imadcn
