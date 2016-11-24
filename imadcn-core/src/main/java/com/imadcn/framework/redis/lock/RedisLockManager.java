@@ -41,7 +41,7 @@ public class RedisLockManager {
 			messageListener = new MessageListener() {
 				@Override
 				public void onMessage(Message message, byte[] pattern) {
-					LOGGER.warn("daemon message received some message...");
+					LOGGER.warn("daemon listener received some message, that's strange");
 				}
 			};
 			container.addMessageListener(messageListener, new ChannelTopic("__redis_lock_channel__:daemon"));
