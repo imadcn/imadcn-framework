@@ -27,6 +27,11 @@ public class RedisLockManager {
 		addDaemonMessageListener();
 	}
 
+	/**
+	 * 获取Redis锁
+	 * @param key
+	 * @return
+	 */
 	public ReentrantRedisLock getLock(String key) {
 		return new ReentrantRedisLock(redisTemplate, container, key, uuid);
 	}
