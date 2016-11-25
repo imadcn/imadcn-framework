@@ -17,15 +17,20 @@
 		<property name="testOnReturn" value="true" />
 	</bean>
 	
+	<bean id="jedisSentinelConfig" class="com.imadcn.framework.redis.config.JedisSentinelConfig">
+		<property name="masterName" value="${redis.sentinel.master}" />
+		<property name="sentinelAddrs" value="${redis.sentinel.nodes}" />
+	</bean>
+	
 	<!-- redis sentinel-->
-	<bean id="jedisSentinelConfig" class="com.imadcn.framework.redis.config.RedisSentinelConfig">
+	<bean id="redisSentinelConfig" class="com.imadcn.framework.redis.config.RedisSentinelConfig">
 		<property name="masterName" value="${redis.sentinel.master}" />
 		<property name="sentinelAddrs" value="${redis.sentinel.nodes}" />
 	</bean>
 	
 	<!-- redis连接工厂  -->
 	<bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">
-		<constructor-arg index="0" ref="jedisSentinelConfig" />
+		<constructor-arg index="0" ref="redisSentinelConfig" />
 		<constructor-arg index="1" ref="jedisPoolConfig" />
 	</bean>
 	
@@ -46,4 +51,9 @@
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="topicSerializer" ref="stringRedisSerializer" />
 	</bean>
+	
+<!-- 	<bean id="jedisLockManager" class="com.imadcn.framework.redis.lock.jedis.JedisLockManager">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1" ref="redisSentinelConfig" />
+	</bean> -->
 </beans>

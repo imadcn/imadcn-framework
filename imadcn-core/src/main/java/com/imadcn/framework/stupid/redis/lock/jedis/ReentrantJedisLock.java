@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock.jedis;
+package com.imadcn.framework.stupid.redis.lock.jedis;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class ReentrantJedisLock implements RedisLock, Serializable {
 		if (eval == null) { // 解锁不是被自己锁定的资源时，抛出异常
 			throw new IllegalMonitorStateException("attempt to unlock lock, not locked by current thread by node id: " + uuid + " thread-id: " + Thread.currentThread().getId());
 		}
-		if (eval.equals(1)) { // 解锁成功，取消生命周期时常刷新task
+		if (eval.equals(1L)) { // 解锁成功，取消生命周期时常刷新task
 			cancelExpirationRenewal();
 		}
 	}
@@ -203,7 +203,9 @@ public class ReentrantJedisLock implements RedisLock, Serializable {
 			 * 但是，有可能任务lock和unlock之间的任务还没执行完，但超时已到，被其他线程锁定的情况，因为设置了1/3超时时间自动刷新生命周期的情况
 			 */
 			scheduleExpirationRenewal();
+			return null;
 		}
+		jedis.close();
 		return Long.valueOf(eval + "");
 	}
 	
@@ -223,6 +225,7 @@ public class ReentrantJedisLock implements RedisLock, Serializable {
 			public void run() {
 				Jedis jedis = jedisPool.getResource();
 				jedis.eval(RENEWAL_SCRIPT, getLuaKeys(getRedisKey()), getLuaParams(internalLockLeaseTime));
+				jedis.close();
 			}
 		}, delay, period);
 		LOGGER.debug("scheduled expiration renewal task in {}", getRedisKey());

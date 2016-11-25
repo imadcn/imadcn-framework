@@ -2,20 +2,19 @@ package com.imadcn.lock.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import com.imadcn.framework.redis.config.JedisSentinelConfig;
 import com.imadcn.framework.redis.lock.RedisLock;
-import com.imadcn.framework.redis.lock.spring.RedisLockManager;
+import com.imadcn.framework.stupid.redis.lock.jedis.JedisLockManager;
 import com.imadcn.framework.util.UIDUtil;
 
 public class JedisLockTest {
@@ -24,20 +23,18 @@ public class JedisLockTest {
 	
 	private static ClassPathXmlApplicationContext context;
 	private static String configPath = "classpath:spring-config.xml";
-	private static RedisMessageListenerContainer container;
-	private static RedisTemplate<Object, Object> redisTemplate;
-	private static RedisLockManager redisLockManager;
+	private static JedisLockManager redisLockManager;
+	private static JedisPoolConfig poolConfig;
+	private static JedisSentinelConfig sentinelConfig;
 	private static ThreadPoolTaskExecutor executor;
 	
-	@SuppressWarnings("unchecked")
 	public JedisLockTest() {
 		context = new ClassPathXmlApplicationContext(new String[] { configPath });
 		context.start();
-		redisTemplate = (RedisTemplate<Object, Object>) context.getBean("redisTemplate");
-		container = context.getBean(RedisMessageListenerContainer.class);
 		executor = context.getBean(ThreadPoolTaskExecutor.class);
-
-		redisLockManager = new RedisLockManager(redisTemplate, container);
+		poolConfig = context.getBean(JedisPoolConfig.class);
+		sentinelConfig = context.getBean(JedisSentinelConfig.class);
+		redisLockManager = new JedisLockManager(poolConfig, sentinelConfig);
 	}
 	
 	/*public void test1() {
@@ -76,7 +73,7 @@ public class JedisLockTest {
 			// print(key);
 			RedisLock lock = redisLockManager.getLock(key);
 			lock.lock();
-			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
+			long sleepElapse = 50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
 			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
@@ -185,6 +182,6 @@ public class JedisLockTest {
 	public static void main(String[] args) throws Exception {
 		JedisLockTest t = new JedisLockTest();
 		t.test1();
-		JedisPool jedisPool = 
+//		t.test1_1("*****************");
 	}
 }

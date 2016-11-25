@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock.jedis;
+package com.imadcn.framework.stupid.redis.lock.jedis;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -53,6 +53,7 @@ public abstract class JedisPublishSubscribe<E extends PubSubEntry<E>> {
     		if (LISTENER_MAP.putIfAbsent(entryName, listener) == null) {
     			LOGGER.debug("message listener added with entry name [{}], channel name [{}]", entryName, channelName);
     			jedis.subscribe(listener, channelName);
+    			jedis.close();
     		}
     		return value;
         }

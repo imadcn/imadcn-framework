@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock.jedis;
+package com.imadcn.framework.stupid.redis.lock.jedis;
 
 import java.util.concurrent.Semaphore;
 

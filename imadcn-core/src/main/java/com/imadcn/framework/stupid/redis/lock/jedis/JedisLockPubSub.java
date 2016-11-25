@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock.jedis;
+package com.imadcn.framework.stupid.redis.lock.jedis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
