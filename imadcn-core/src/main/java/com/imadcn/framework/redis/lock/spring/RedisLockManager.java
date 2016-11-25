@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock;
+package com.imadcn.framework.redis.lock.spring;
 
 import java.util.UUID;
 
@@ -9,6 +9,8 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+
+import com.imadcn.framework.redis.lock.RedisLock;
 
 public class RedisLockManager {
 	
@@ -32,7 +34,7 @@ public class RedisLockManager {
 	 * @param key
 	 * @return
 	 */
-	public ReentrantRedisLock getLock(String key) {
+	public RedisLock getLock(String key) {
 		return new ReentrantRedisLock(redisTemplate, container, key, uuid);
 	}
 	

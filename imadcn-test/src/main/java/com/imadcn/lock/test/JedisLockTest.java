@@ -1,32 +1,42 @@
-package com.imadcn.framework.test;
+package com.imadcn.lock.test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import com.imadcn.framework.redis.lock.RedisLock;
 import com.imadcn.framework.redis.lock.spring.RedisLockManager;
-import com.imadcn.framework.util.DateFormatUtil;
 import com.imadcn.framework.util.UIDUtil;
 
-public class LockTest {
+public class JedisLockTest {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(JedisLockTest.class);
+	
 	private static ClassPathXmlApplicationContext context;
 	private static String configPath = "classpath:spring-config.xml";
 	private static RedisMessageListenerContainer container;
 	private static RedisTemplate<Object, Object> redisTemplate;
 	private static RedisLockManager redisLockManager;
+	private static ThreadPoolTaskExecutor executor;
 	
 	@SuppressWarnings("unchecked")
-	public LockTest() {
+	public JedisLockTest() {
 		context = new ClassPathXmlApplicationContext(new String[] { configPath });
 		context.start();
 		redisTemplate = (RedisTemplate<Object, Object>) context.getBean("redisTemplate");
 		container = context.getBean(RedisMessageListenerContainer.class);
+		executor = context.getBean(ThreadPoolTaskExecutor.class);
+
 		redisLockManager = new RedisLockManager(redisTemplate, container);
 	}
 	
@@ -40,36 +50,36 @@ public class LockTest {
 		lock.unlock(key + System.currentTimeMillis());
 	}*/
 	
-	private static int counter = 0;
+	private Integer counter = 0;
 	private static List<String> queue = new ArrayList<String>();
 	private static List<Exception> exceptions = new ArrayList<Exception>();
 	
-	private static final int typeNum = 1;
-	private static final int execNum = 20 * 100;
+	private static final int typeNum = 20;
+	private static final int execNum = 500;
 	
 	public void test1() {
 		for (int i = 0; i < typeNum; i++) {
 			final String key = UIDUtil.noneDashUuid();
 			for (int j = 0; j < execNum; j++) {
-				new Thread(new Runnable() {
+				executor.execute(new Runnable() {
 					@Override
 					public void run() {
 						test1_1(key);
 					}
-				}).start();
+				});
 			}
 		}
 	}
 	
 	private void test1_1(String key) {
 		try {
-			print(key);
+			// print(key);
 			RedisLock lock = redisLockManager.getLock(key);
 			lock.lock();
 			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
-			print(String.format("[%s] key [%s] locked in thread id [%s]. try to sleep [%s] ms", DateFormatUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), key, threadId, sleepElapse));
+			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
@@ -77,8 +87,10 @@ public class LockTest {
 				}
 			}
 			lock.unlock();
-			counter++;
-			print(String.format("[%s] key [%s] unlocked in thread id [%s].", DateFormatUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), key, threadId));
+			synchronized (counter) {
+				counter++;
+			}
+			LOGGER.info(String.format("key [%s] unlocked in thread id [%s].", key, threadId));
 		} catch (Exception e) {
 			e.printStackTrace();
 			exceptions.add(e);
@@ -89,24 +101,24 @@ public class LockTest {
 	public void test2() {
 		final String key = UIDUtil.noneDashUuid();
 		for (int i = 0; i < 10; i++) {
-			new Thread(new Runnable() {
+			executor.execute(new Runnable() {
 				@Override
 				public void run() {
 					test2_1(key);
 				}
-			}).start();
+			});
 		}
 	}
 	
 	private void test2_1(String key) {
 		try {
-			print(key);
+			// print(key);
 			RedisLock lock = redisLockManager.getLock(key);
 			lock.tryLock(1, TimeUnit.MILLISECONDS);
 			long sleepElapse = 0; //50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
-			print(String.format("[%s] key [%s] locked in thread id [%s]. try to sleep [%s] ms", DateFormatUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), key, threadId, sleepElapse));
+			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
@@ -114,8 +126,10 @@ public class LockTest {
 				}
 			}
 			lock.unlock();
-			counter++;
-			print(String.format("[%s] key [%s] unlocked in thread id [%s].", DateFormatUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), key, threadId));
+			synchronized (counter) {
+				counter++;
+			}
+			LOGGER.info(String.format("key [%s] unlocked in thread id [%s].", key, threadId));
 		} catch (Exception e) {
 			e.printStackTrace();
 			exceptions.add(e);
@@ -124,6 +138,7 @@ public class LockTest {
 	}
 	
 	private void showResult() {
+		System.out.println("counter: " + counter);
 		if (counter >= typeNum * execNum && typeNum > 0 && execNum > 0) {
 			try {
 				Thread.sleep(2000);
@@ -140,7 +155,7 @@ public class LockTest {
 						}
 					}
 				} else {
-					System.out.println("too many reseult, only show total when greater than 500, that's :" + queue.size());
+					System.out.println("too many results, show total only when it's greater than 500 : [" + queue.size() + "]");
 				}
 				System.out.println("-------------------------------------------------------------------------");
 				if (exceptions.size() <= 500) {
@@ -155,7 +170,7 @@ public class LockTest {
 						}
 					}
 				} else {
-					System.out.println("too many exceptions, only show total when greater than 500, that's :" + exceptions.size());
+					System.out.println("too many exceptions, only show total when greater than 500 : [" + exceptions.size() + "]");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -168,7 +183,8 @@ public class LockTest {
 	} 
 	
 	public static void main(String[] args) throws Exception {
-		LockTest t = new LockTest();
+		JedisLockTest t = new JedisLockTest();
 		t.test1();
+		JedisPool jedisPool = 
 	}
 }

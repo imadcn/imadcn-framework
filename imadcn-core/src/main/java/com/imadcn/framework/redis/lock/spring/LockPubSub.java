@@ -1,9 +1,7 @@
-package com.imadcn.framework.redis.pubsub;
+package com.imadcn.framework.redis.lock.spring;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.imadcn.framework.redis.lock.RedisLockEntry;
 
 /**
  * 基于redis发布订阅功能，实现锁资源释放监听
@@ -29,5 +27,10 @@ public class LockPubSub extends PublishSubscribe<RedisLockEntry> {
 	@Override
 	protected RedisLockEntry createEntry(String channelName) {
 		return new RedisLockEntry(channelName);
+	}
+	
+	public static void main(String[] args) {
+		Object o = 111;
+		System.out.println(o.equals(111));
 	}
 }

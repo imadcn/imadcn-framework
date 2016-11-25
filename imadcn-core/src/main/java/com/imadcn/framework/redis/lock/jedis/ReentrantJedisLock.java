@@ -1,6 +1,8 @@
-package com.imadcn.framework.redis.lock;
+package com.imadcn.framework.redis.lock.jedis;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -8,48 +10,36 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.ReturnType;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.RedisSerializer;
 
-import com.imadcn.framework.redis.pubsub.LockPubSub;
+import redis.clients.jedis.Jedis;
+import redis.clients.util.Pool;
 
-/**
- * 可重入的分布式锁, 基于redis
- * @author imadcn
- */
-public class ReentrantRedisLock implements Lock, Serializable  {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ReentrantRedisLock.class);
+import com.imadcn.framework.redis.lock.RedisLock;
 
-	private static final long serialVersionUID = -4746390442550034783L;
+public class ReentrantJedisLock implements RedisLock, Serializable {
+
+	private static final long serialVersionUID = 8096828261876799032L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReentrantJedisLock.class);
 	private static final long DEFAULT_LEASE_TIME = 30 * 1000L; // 默认Redis锁，锁定时间，30秒
+	private static final ConcurrentMap<String, Timer> RENEWAL_MAP = new ConcurrentHashMap<String, Timer>(); // 存放刷新锁生命期的task的map
+
+	private static final JedisLockPubSub PUBSUB = new JedisLockPubSub();
+	
 	protected long internalLockLeaseTime = DEFAULT_LEASE_TIME; // 锁生命期
-	public static final ConcurrentMap<String, Timer> RENEWAL_MAP = new ConcurrentHashMap<String, Timer>(); // 存放刷新锁生命期的task的map
-	
-	private static final LockPubSub PUBSUB = new LockPubSub(); // redis 发布订阅功能，用于lock排队解锁
-	
-	private RedisTemplate<Object, Object> redisTemplate; // redisTemplate
-	private RedisMessageListenerContainer container;
-	
-	final UUID uuid;
-	private String key; //rediskey Name;
-	
-	ReentrantRedisLock(RedisTemplate<Object, Object> redisTemplate, RedisMessageListenerContainer container, String key, UUID uuid) {
-		this.redisTemplate = redisTemplate;
-		this.container = container;
-		this.key = key;
+
+	private Pool<Jedis> jedisPool;
+	private final UUID uuid;
+	private String key;
+
+	ReentrantJedisLock(Pool<Jedis> jedisPool, UUID uuid, String key) {
+		this.jedisPool = jedisPool;
 		this.uuid = uuid;
+		this.key = key;
 	}
-	
+
 	@Override
 	public void lock() {
 		try {
@@ -84,6 +74,36 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		return false;
 	}
 	
+	
+
+	@Override
+	public void unlock() { 
+		Jedis jedis = jedisPool.getResource();
+		Object eval = jedis.eval(UNLOCK_SCRIPT, getLuaKeys(getRedisKey(), getChannelName()), getLuaParams(getHashField(), internalLockLeaseTime, JedisLockPubSub.UNLOCK_PUBSUB_MESSAGE));
+		if (eval == null) { // 解锁不是被自己锁定的资源时，抛出异常
+			throw new IllegalMonitorStateException("attempt to unlock lock, not locked by current thread by node id: " + uuid + " thread-id: " + Thread.currentThread().getId());
+		}
+		if (eval.equals(1)) { // 解锁成功，取消生命周期时常刷新task
+			cancelExpirationRenewal();
+		}
+	}
+	
+	@Override
+	public Condition newCondition() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public boolean isLocked() {
+		Jedis jedis = jedisPool.getResource();
+		Object eval = jedis.eval(CHECK_LOCKED_SCRIPT, getLuaKeys(getRedisKey()), getLuaParams(getHashField()));
+		if (eval.equals(1)) { 
+			return Boolean.TRUE;
+		} else {
+			return Boolean.FALSE;
+		}
+	}
+
 	/**
 	 * 可能会中断的锁定操作
 	 * @param leaseTime 锁定周期
@@ -95,14 +115,14 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		if (ttl == null) { // lock acquired
 			return;
 		}
-		RedisLockEntry subscribeEntry = subscribe(); // 添加pubsub功能，监听解锁时间
+		JedisLockEntry subscribeEntry = subscribe(); // 添加pubsub功能，监听解锁时间
 		try {
 			while(true) {
 				ttl = tryAcquire(leaseTime, unit);
 				if (ttl == null) { // lock acquired
 					break;
 				}
-				RedisLockEntry entry = PUBSUB.getEntry(getEntryName()); // 用于触发解锁事件操作的实例
+				JedisLockEntry entry = PUBSUB.getEntry(getEntryName()); // 用于触发解锁事件操作的实例
 				LOGGER.debug("[{}] get entry", entry.getTag());
 				if (ttl >= 0) {
 					LOGGER.debug("[{}] acquire with tll {} ms, latch id [{}]", entry.getTag(), ttl, entry.getLatch());
@@ -135,7 +155,7 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		if (time <= 0) {
 			return false;
 		}
-		RedisLockEntry subscribeEntry = subscribe();
+		JedisLockEntry subscribeEntry = subscribe();
 		try {
 			while(true) {
 				ttl = tryAcquire(leaseTime, unit);
@@ -148,7 +168,7 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 				
 				// waiting for message
                 long current = System.currentTimeMillis();
-                RedisLockEntry entry = PUBSUB.getEntry(getEntryName());
+                JedisLockEntry entry = PUBSUB.getEntry(getEntryName());
                 
                 if (ttl >= 0 && ttl < time) { // 前一资源剩余生命周期 和 自己等待时间，以最短的作为锁定时间
                     entry.getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
@@ -164,46 +184,7 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		}
 		
 	}
-
-	@Override
-	public void unlock() { 
-		Long eval = redisTemplate.execute(new RedisCallback<Long>() {
-			public Long doInRedis(RedisConnection connection) throws DataAccessException {
-				Long eval = connection.eval(serializeScript(UNLOCK_SCRIPT), ReturnType.INTEGER, 2, serializeParams(getRedisKey(), getChannelName(), getHashField(), internalLockLeaseTime, LockPubSub.UNLOCK_PUBSUB_MESSAGE));
-				return eval;
-			}
-		});
-		if (eval == null) { // 解锁不是被自己锁定的资源时，抛出异常
-			throw new IllegalMonitorStateException("attempt to unlock lock, not locked by current thread by node id: " + uuid + " thread-id: " + Thread.currentThread().getId());
-		}
-		if (eval == 1) { // 解锁成功，取消生命周期时常刷新task
-			cancelExpirationRenewal();
-		}
-	}
 	
-	@Override
-	public Condition newCondition() {
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * 判断是否已经被任意锁成功锁定
-	 * @return 是返回<b>true</b>,否则返回<b>false</b>
-	 */
-	public boolean isLocked() { 
-		Boolean execute = redisTemplate.execute(new RedisCallback<Boolean>() {
-			public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
-				Long eval = connection.eval(serializeScript(CHECK_LOCKED_SCRIPT), ReturnType.INTEGER, 1, serializeParams(getRedisKey(), getHashField()));
-				if (eval == 1) { 
-					return Boolean.TRUE;
-				} else {
-					return Boolean.FALSE;
-				}
-			}
-		});
-		return execute;
-	}
-
 	/**
 	 * 尝试锁定某个key
 	 * @param leaseTime 生命周期
@@ -214,20 +195,16 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		if (leaseTime >= 0) {
 			this.internalLockLeaseTime = unit.toMillis(leaseTime);
 		}
-		Long eval = redisTemplate.execute(new RedisCallback<Long>() {
-			public Long doInRedis(RedisConnection connection) throws DataAccessException {
-				Long eval = connection.eval(serializeScript(LOCK_SCRIPT), ReturnType.INTEGER, 1, serializeParams(getRedisKey(), getHashField(), internalLockLeaseTime));
-				return eval;
-			}
-		});
+		Jedis jedis = jedisPool.getResource();
+		Object eval = jedis.eval(LOCK_SCRIPT, getLuaKeys(getRedisKey()), getLuaParams(getHashField(), internalLockLeaseTime));
 		if (eval == null) { 
 			/**
 			 * 锁定成功，在脚本中，添加了超时机制，防止某个机器宕机，造成资源死锁，因为有设置超时时间
 			 * 但是，有可能任务lock和unlock之间的任务还没执行完，但超时已到，被其他线程锁定的情况，因为设置了1/3超时时间自动刷新生命周期的情况
 			 */
 			scheduleExpirationRenewal();
-		} 
-		return eval;
+		}
+		return Long.valueOf(eval + "");
 	}
 	
 	/**
@@ -244,12 +221,8 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				redisTemplate.execute(new RedisCallback<Long>() {
-					public Long doInRedis(RedisConnection connection) throws DataAccessException {
-						Long pttl = connection.eval(serializeScript(RENEWAL_SCRIPT), ReturnType.INTEGER, 1, serializeParams(getRedisKey(), internalLockLeaseTime));
-						return pttl; // time to expired
-					}
-				});
+				Jedis jedis = jedisPool.getResource();
+				jedis.eval(RENEWAL_SCRIPT, getLuaKeys(getRedisKey()), getLuaParams(internalLockLeaseTime));
 			}
 		}, delay, period);
 		LOGGER.debug("scheduled expiration renewal task in {}", getRedisKey());
@@ -268,23 +241,23 @@ public class ReentrantRedisLock implements Lock, Serializable  {
         if (timer != null) {
         	timer.cancel();
         }
-        LOGGER.debug("renewal task size : {}", ReentrantRedisLock.RENEWAL_MAP.size());
+        LOGGER.debug("renewal task size : {}", RENEWAL_MAP.size());
 	}
 
 	/**
 	 * 添加解锁监听事件
 	 * @return
 	 */
-	private RedisLockEntry subscribe() { 
-		return PUBSUB.subscribe(getEntryName(), getChannelName(), container);
+	private JedisLockEntry subscribe() { 
+		return PUBSUB.subscribe(getEntryName(), getChannelName(), jedisPool.getResource());
 	}
 	
 	/**
 	 * 解除监听
 	 * @param subscribeEntry
 	 */
-	private void unsubscribe(RedisLockEntry subscribeEntry) { 
-		PUBSUB.unsubscribe(subscribeEntry, getEntryName(), container);
+	private void unsubscribe(JedisLockEntry subscribeEntry) { 
+		PUBSUB.unsubscribe(subscribeEntry, getEntryName(), jedisPool.getResource());
 	}
 	
 	private String getRedisKey() { // redis中锁key
@@ -303,43 +276,34 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 		return uuid + ":" + getRedisKey();
 	}
 	
-	public void setRedisTemplate(RedisTemplate<Object, Object> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected RedisSerializer<Object> getKeySerializer() {
-		return (RedisSerializer<Object>) redisTemplate.getKeySerializer();
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected RedisSerializer<Object> getValueSerializer() {
-		return (RedisSerializer<Object>) redisTemplate.getValueSerializer();
-	}
-	
 	/**
-	 * 序列化KEY和参数
-	 * @param params
+	 * 获取lua脚本的key
+	 * @param keys
 	 * @return
 	 */
-	protected byte[][] serializeParams(Object... params) {
-		byte[][] serialize = null;
-		if (params != null && params.length > 0) {
-			serialize = new byte[params.length][];
-			for (int i = 0; i < params.length; i++) {
-				serialize[i] = getKeySerializer().serialize(params[i] + "");
+	protected List<String> getLuaKeys(Object... keys) {
+		List<String> luaKeys = new ArrayList<String>();
+		if (keys != null && keys.length > 0) {
+			for (int i = 0; i < keys.length; i++) {
+				luaKeys.add("" + keys[i]);
 			}
 		}
-		return serialize;
+		return luaKeys;
 	}
 	
 	/**
-	 * 序列化lua脚本
+	 * 获取lua脚本的参数
 	 * @param params
 	 * @return
 	 */
-	protected byte[] serializeScript(Object params) {
-		return getKeySerializer().serialize(params);
+	protected List<String> getLuaParams(Object... params) {
+		List<String> luaParams = new ArrayList<String>();
+		if (params != null && params.length > 0) {
+			for (int i = 0; i < params.length; i++) {
+				luaParams.add("" + params[i]);
+			}
+		}
+		return luaParams;
 	}
 	
 	/**
@@ -396,5 +360,5 @@ public class ReentrantRedisLock implements Lock, Serializable  {
 	private static final String RENEWAL_SCRIPT = 
 										"redis.call('pexpire', KEYS[1], ARGV[1]); " + 
 										"return redis.call('pttl', KEYS[1]);";
-	
+
 }

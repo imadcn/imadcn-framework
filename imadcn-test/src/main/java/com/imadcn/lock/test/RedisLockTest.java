@@ -11,8 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.imadcn.framework.redis.lock.RedisLockManager;
-import com.imadcn.framework.redis.lock.ReentrantRedisLock;
+import com.imadcn.framework.redis.lock.RedisLock;
+import com.imadcn.framework.redis.lock.spring.RedisLockManager;
 import com.imadcn.framework.util.UIDUtil;
 
 public class RedisLockTest {
@@ -71,7 +71,7 @@ public class RedisLockTest {
 	private void test1_1(String key) {
 		try {
 			// print(key);
-			ReentrantRedisLock lock = redisLockManager.getLock(key);
+			RedisLock lock = redisLockManager.getLock(key);
 			lock.lock();
 			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();
@@ -110,7 +110,7 @@ public class RedisLockTest {
 	private void test2_1(String key) {
 		try {
 			// print(key);
-			ReentrantRedisLock lock = redisLockManager.getLock(key);
+			RedisLock lock = redisLockManager.getLock(key);
 			lock.tryLock(1, TimeUnit.MILLISECONDS);
 			long sleepElapse = 0; //50 * 60 * 1000 + new Random().nextInt(500);
 			long threadId = Thread.currentThread().getId();

@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.pubsub;
+package com.imadcn.framework.redis.lock.spring;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -10,6 +10,8 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+
+import com.imadcn.framework.redis.pubsub.PubSubEntry;
 
 /**
  * 发布订阅工具
