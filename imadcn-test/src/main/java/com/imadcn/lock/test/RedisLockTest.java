@@ -51,8 +51,8 @@ public class RedisLockTest {
 	private static List<String> queue = new ArrayList<String>();
 	private static List<Exception> exceptions = new ArrayList<Exception>();
 	
-	private static final int typeNum = 20;
-	private static final int execNum = 500;
+	private static final int typeNum = 1;
+	private static final int execNum = 10;
 	
 	public void test1() {
 		for (int i = 0; i < typeNum; i++) {
@@ -81,6 +81,8 @@ public class RedisLockTest {
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
 					break;
+				} else {
+					throw new RuntimeException("test exception");
 				}
 			}
 			lock.unlock();
