@@ -51,7 +51,7 @@ public class RedisLockTest {
 	private static List<String> queue = new ArrayList<String>();
 	private static List<Exception> exceptions = new ArrayList<Exception>();
 	
-	private static final int typeNum = 1;
+	private static final int typeNum = 5;
 	private static final int execNum = 10;
 	
 	public void test1() {
@@ -68,21 +68,52 @@ public class RedisLockTest {
 		}
 	}
 	
+	public void test2() {
+		final String key = UIDUtil.noneDashUuid();
+		for (int i = 0; i < 10; i++) {
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					test2_1(key);
+				}
+			});
+		}
+	}
+	
+	public void test3() {
+		// test in different process
+//		String key = UIDUtil.noneDashUuid();
+		String key = "2017010100000000000001";
+		RedisLock lock = redisLockManager.getLock(key);
+		long threadId = Thread.currentThread().getId();
+		try {
+			lock.lock();
+			long timestmap = System.currentTimeMillis();
+			LOGGER.info("lock in thread [{}] with key [{}]", threadId, key);
+			while(true) {
+				if (System.currentTimeMillis() - timestmap >= 10 * 1000) {
+					break;
+				}
+			}
+		} finally {
+			LOGGER.info("key [{}] unlock in thread [{}]", key, threadId);
+			lock.unlock();
+		}
+	}
+
 	private void test1_1(String key) {
 		try {
+			long threadId = Thread.currentThread().getId();
 			// print(key);
 			RedisLock lock = redisLockManager.getLock(key);
 			lock.lock();
 			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
-			long threadId = Thread.currentThread().getId();
 			queue.add(key + ":" + threadId);
 			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
 			while(true) {
 				if (beginTime + sleepElapse < System.currentTimeMillis()) {
 					break;
-				} else {
-					throw new RuntimeException("test exception");
 				}
 			}
 			lock.unlock();
@@ -95,18 +126,6 @@ public class RedisLockTest {
 			exceptions.add(e);
 		}
 		showResult();
-	}
-	
-	public void test2() {
-		final String key = UIDUtil.noneDashUuid();
-		for (int i = 0; i < 10; i++) {
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					test2_1(key);
-				}
-			});
-		}
 	}
 	
 	private void test2_1(String key) {
@@ -183,6 +202,6 @@ public class RedisLockTest {
 	
 	public static void main(String[] args) throws Exception {
 		RedisLockTest t = new RedisLockTest();
-		t.test1();
+		t.test3();
 	}
 }

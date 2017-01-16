@@ -20,6 +20,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import com.imadcn.framework.redis.lock.RedisLock;
+import com.imadcn.framework.redis.pubsub.LockPubSub;
 
 /**
  * 可重入的分布式锁, 基于redis
@@ -40,11 +41,21 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	private RedisMessageListenerContainer container;
 	
 	final UUID uuid;
+	final String groupName; // 功能组名字
 	private String key; //rediskey Name;
 	
-	ReentrantRedisLock(RedisTemplate<Object, Object> redisTemplate, RedisMessageListenerContainer container, String key, UUID uuid) {
+	/**
+	 * 可重入的分布式锁, 基于redis
+	 * @param redisTemplate 
+	 * @param container
+	 * @param groupName 功能组名字
+	 * @param key 需要锁定的唯一KEY名字
+	 * @param uuid 线程uuid（鉴别同一key在不同物理机上lock/unlock触发事件）
+	 */
+	ReentrantRedisLock(RedisTemplate<Object, Object> redisTemplate, RedisMessageListenerContainer container, String groupName, String key, UUID uuid) {
 		this.redisTemplate = redisTemplate;
 		this.container = container;
+		this.groupName = groupName;
 		this.key = key;
 		this.uuid = uuid;
 	}
@@ -256,7 +267,6 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	
 	/**
 	 * 取消刷新过期时间 
-	 *
 	 */
 	private void cancelExpirationRenewal() {
 		LOGGER.debug("cancel expiration renewal task in {}", getRedisKey());
@@ -284,7 +294,8 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	}
 	
 	private String getRedisKey() { // redis中锁key
-		return "redis_lock_key." + key; 
+		// prefix + groupname + keyname
+		return "redis_lock_key." + groupName + "." + key; 
 	} 
 	
 	private String getChannelName() { // pubsub监听频道id

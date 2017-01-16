@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,7 +13,12 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import com.imadcn.framework.redis.lock.RedisLock;
 
-public class RedisLockManager {
+/**
+ * Redis lock 配置管理器
+ * @author yc
+ * @since 2017年1月16日
+ */
+public class RedisLockManager implements InitializingBean {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisLockManager.class);
 	private final UUID uuid = UUID.randomUUID();
@@ -20,12 +26,20 @@ public class RedisLockManager {
 	private RedisTemplate<Object, Object> redisTemplate;
 	private RedisMessageListenerContainer container;
 	private MessageListener messageListener;
+	private String groupName; // 功能组名
 	
 	public RedisLockManager() {}
 	
-	public RedisLockManager(RedisTemplate<Object, Object> redisTemplate, RedisMessageListenerContainer container) {
+	/**
+	 * Redis lock 配置管理器
+	 * @param redisTemplate
+	 * @param container 
+	 * @param groupName 功能组名(在不同程序中，KEY可能相同，需加入鉴别功能模块的组名)
+	 */
+	public RedisLockManager(RedisTemplate<Object, Object> redisTemplate, RedisMessageListenerContainer container, String groupName) {
 		this.redisTemplate = redisTemplate;
 		this.container = container;
+		this.groupName = groupName;
 		addDaemonMessageListener();
 	}
 
@@ -35,7 +49,7 @@ public class RedisLockManager {
 	 * @return
 	 */
 	public RedisLock getLock(String key) {
-		return new ReentrantRedisLock(redisTemplate, container, key, uuid);
+		return new ReentrantRedisLock(redisTemplate, container, groupName, key, uuid);
 	}
 	
 	private void addDaemonMessageListener() {
@@ -57,5 +71,23 @@ public class RedisLockManager {
 	public void setContainer(RedisMessageListenerContainer container) {
 		this.container = container;
 		addDaemonMessageListener();
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (redisTemplate == null) {
+			throw new IllegalArgumentException("redis template cant be null");
+		}
+		if (container == null) {
+			throw new IllegalArgumentException("redis message listener cant be null");
+		}
+		if (groupName == null || groupName.isEmpty()) {
+			throw new IllegalArgumentException("lock group name cant be null or empty");
+		}
+		addDaemonMessageListener();	
 	}
 }

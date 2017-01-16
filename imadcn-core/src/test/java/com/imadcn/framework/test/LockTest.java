@@ -27,7 +27,7 @@ public class LockTest {
 		context.start();
 		redisTemplate = (RedisTemplate<Object, Object>) context.getBean("redisTemplate");
 		container = context.getBean(RedisMessageListenerContainer.class);
-		redisLockManager = new RedisLockManager(redisTemplate, container);
+		redisLockManager = new RedisLockManager(redisTemplate, container, "test");
 	}
 	
 	/*public void test1() {
