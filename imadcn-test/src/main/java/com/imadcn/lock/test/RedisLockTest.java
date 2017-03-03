@@ -34,7 +34,7 @@ public class RedisLockTest {
 		container = context.getBean(RedisMessageListenerContainer.class);
 		executor = context.getBean(ThreadPoolTaskExecutor.class);
 
-		redisLockManager = new RedisLockManager(redisTemplate, container);
+		redisLockManager = new RedisLockManager(redisTemplate, container, "group");
 	}
 	
 	/*public void test1() {
