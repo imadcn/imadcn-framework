@@ -9,6 +9,7 @@
 	<modules>
 		<module>imadcn-core</module>
 		<module>imadcn-test</module>
+		<module>imadcn-demo</module>
 	</modules>
 
 	<properties>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:rdb="http://www.dangdang.com/schema/ddframe/rdb" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd 
+                        http://www.dangdang.com/schema/ddframe/rdb 
+                        http://www.dangdang.com/schema/ddframe/rdb/rdb.xsd 
+                        ">
+    <context:property-placeholder location="classpath:corecofig_dev.properties"/>
+
+    <bean id="db_node_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db1.jdbc.driverClassName}"/>
+        <property name="url" value="${db1.jdbc.url}"/>
+        <property name="username" value="${db1.jdbc.username}"/>
+        <property name="password" value="${db1.jdbc.password}"/>
+    </bean>
+    
+    <bean id="db_node_2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db2.jdbc.driverClassName}"/>
+        <property name="url" value="${db2.jdbc.url}"/>
+        <property name="username" value="${db2.jdbc.username}"/>
+        <property name="password" value="${db2.jdbc.password}"/>
+    </bean>
+    
+	<bean id="db_node_3" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db3.jdbc.driverClassName}"/>
+        <property name="url" value="${db3.jdbc.url}"/>
+        <property name="username" value="${db3.jdbc.username}"/>
+        <property name="password" value="${db3.jdbc.password}"/>
+    </bean>
+    
+	<bean id="db_node_4" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db4.jdbc.driverClassName}"/>
+        <property name="url" value="${db4.jdbc.url}"/>
+        <property name="username" value="${db4.jdbc.username}"/>
+        <property name="password" value="${db4.jdbc.password}"/>
+    </bean>
+
+	<!-- 分表策略 -->
+    <rdb:strategy id="orderTableStrategy" sharding-columns="orderId" algorithm-class="com.imadcn.framework.rdb.sharding.ddsj.algorithm.table.SingleKeyTableAlgorithm"/>
+    <!-- 分库策略 -->
+<!--   <rdb:strategy id="orderDataSourceStrategy" sharding-columns="userId" algorithm-class="com.imadcn.framework.rdb.sharding.ddsj.algorithm.database.SingleKeyDatabaseAlgorithm"/> -->
+<!--   <rdb:strategy id="orderItemTableStrategy" sharding-columns="order_id" algorithm-expression="t_order_item_${order_id.longValue() % 4}"/> -->
+
+	<!-- sharding datasource -->
+    <rdb:data-source id="shardingDataSource">
+        <rdb:sharding-rule data-sources="db_node_1,db_node_2,db_node_3,db_node_4">
+            <rdb:table-rules>
+                <rdb:table-rule logic-table="t_order" actual-tables="t_order_${0..3}" table-strategy="orderTableStrategy"/>
+            </rdb:table-rules>
+            <rdb:default-database-strategy sharding-columns="userId" algorithm-class="com.imadcn.framework.rdb.sharding.ddsj.algorithm.database.SingleKeyDatabaseAlgorithm"/>
+<!--             <rdb:default-database-strategy sharding-columns="user_id" algorithm-expression="dbtbl_${user_id.longValue() % 2 + 1}"/> -->
+        </rdb:sharding-rule>
+    </rdb:data-source>
+</beans>

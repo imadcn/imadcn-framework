@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:redis="http://www.springframework.org/schema/redis"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/redis http://www.springframework.org/schema/redis/spring-redis.xsd">
+
+	<!-- redis线程池 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.pool.maxTotal}"/>
+		<property name="maxIdle" value="${redis.pool.maxIdle}" />
+		<property name="maxWaitMillis" value="${redis.pool.maxWaitMills}" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="true" />
+	</bean>
+	
+	<bean id="jedisSentinelConfig" class="com.imadcn.framework.redis.config.JedisSentinelConfig">
+		<property name="masterName" value="${redis.sentinel.master}" />
+		<property name="sentinelAddrs" value="${redis.sentinel.nodes}" />
+	</bean>
+	
+	<!-- redis sentinel-->
+	<bean id="redisSentinelConfig" class="com.imadcn.framework.redis.config.RedisSentinelConfig">
+		<property name="masterName" value="${redis.sentinel.master}" />
+		<property name="sentinelAddrs" value="${redis.sentinel.nodes}" />
+	</bean>
+	
+	<!-- redis连接工厂  -->
+	<bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">
+		<constructor-arg index="0" ref="redisSentinelConfig" />
+		<constructor-arg index="1" ref="jedisPoolConfig" />
+	</bean>
+	
+	<bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	<bean id="jdkSerializationRedisSerializer" class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+	
+	<!-- spring.data.redis 提供的操作模板类，在传输数据的时候，是用byte[]，因此指定了序列化方式 -->
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="keySerializer" ref="stringRedisSerializer" />
+		<property name="valueSerializer" ref="jdkSerializationRedisSerializer" />
+		<property name="hashKeySerializer" ref="stringRedisSerializer"/>
+		<property name="hashValueSerializer" ref="jdkSerializationRedisSerializer"/>
+		<property name="stringSerializer" ref="stringRedisSerializer" />
+	</bean>
+	
+	<bean id="redisMessageListenerContainer" class="org.springframework.data.redis.listener.RedisMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="topicSerializer" ref="stringRedisSerializer" />
+	</bean>
+	
+<!-- 	<bean id="jedisLockManager" class="com.imadcn.framework.redis.lock.jedis.JedisLockManager">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1" ref="redisSentinelConfig" />
+	</bean> -->
+</beans>
