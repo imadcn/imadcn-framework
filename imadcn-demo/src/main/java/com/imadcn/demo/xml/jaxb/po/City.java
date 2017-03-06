@@ -1,4 +1,4 @@
-package com.imadcn.demo.xml.jaxb;
+package com.imadcn.demo.xml.jaxb.po;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;

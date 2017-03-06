@@ -6,11 +6,16 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import com.imadcn.demo.xml.jaxb.po.Country;
+import com.imadcn.demo.xml.jaxb.po.City;
+import com.imadcn.demo.xml.jaxb.po.Province;
+
 public class JaxbTest {
 	
-	public China getData() {
-		China china = new China();
+	public Country getData() {
+		Country china = new Country();
 		List<Province> provincesList = new ArrayList<>();
+		china.setCoutryName("China");
 		china.setProvinces(provincesList);
 		
 		Province sichuan = new Province();
@@ -52,7 +57,7 @@ public class JaxbTest {
 	} 
 	
 	public void test() throws Exception {
-		JAXBContext context = JAXBContext.newInstance(China.class, Province.class, City.class);    // 获取上下文对象  
+		JAXBContext context = JAXBContext.newInstance(Country.class, Province.class, City.class);    // 获取上下文对象  
         Marshaller marshaller = context.createMarshaller(); // 根据上下文获取marshaller对象  
           
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");  // 设置编码字符集  
