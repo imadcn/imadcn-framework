@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://code.imadcn.com/schema/lock" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	targetNamespace="http://code.imadcn.com/schema/lock"
+	elementFormDefault="qualified">
+	
+	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+	<xsd:element name="config" type="managerConfigType">
+		<xsd:annotation>
+			<xsd:documentation>redis lock manager configuration</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:complexType name="managerConfigType">
+		<xsd:attribute name="id" type="xsd:string" use="optional" />
+		<xsd:attribute name="group" type="xsd:string" use="required" />
+		<xsd:attribute name="redisTemplate" type="xsd:string" use="optional" />
+		<xsd:attribute name="messageContainer" type="xsd:string" use="optional" />
+	</xsd:complexType>
+</xsd:schema>

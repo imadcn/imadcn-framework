@@ -23,9 +23,10 @@ public class RedisLockManager implements InitializingBean {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisLockManager.class);
 	private final UUID uuid = UUID.randomUUID();
 	
+	protected String id;
 	private RedisTemplate<Object, Object> redisTemplate;
 	private RedisMessageListenerContainer container;
-	private MessageListener messageListener;
+	private volatile MessageListener messageListener;
 	private String groupName; // 功能组名
 	
 	public RedisLockManager() {}
@@ -75,6 +76,10 @@ public class RedisLockManager implements InitializingBean {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	@Override

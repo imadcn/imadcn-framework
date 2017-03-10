@@ -1,4 +1,4 @@
-package com.imadcn.lock.test;
+package com.imadcn.test.lock;
 
 import java.util.Random;
 

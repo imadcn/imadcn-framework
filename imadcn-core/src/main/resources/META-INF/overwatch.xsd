@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://code.imadcn.com/schema/overwatch"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	targetNamespace="http://code.imadcn.com/schema/overwatch"
+	elementFormDefault="qualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+
+
+	<xsd:complexType name="avatarType">
+		<xsd:attribute name="id" type="xsd:int" use="required"></xsd:attribute>
+		<xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="type">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="Genji"></xsd:enumeration>
+					<xsd:enumeration value="Mccree"></xsd:enumeration>
+					<xsd:enumeration value="Pharah"></xsd:enumeration>
+					<xsd:enumeration value="Reaper"></xsd:enumeration>
+					<xsd:enumeration value="Soilder76"></xsd:enumeration>
+					<xsd:enumeration value="Sombra"></xsd:enumeration>
+					<xsd:enumeration value="Tracer"></xsd:enumeration>
+					<xsd:enumeration value="Bastion"></xsd:enumeration>
+					<xsd:enumeration value="Hanzo"></xsd:enumeration>
+					<xsd:enumeration value="Junkrat"></xsd:enumeration>
+					<xsd:enumeration value="Mei"></xsd:enumeration>
+					<xsd:enumeration value="Torbjon"></xsd:enumeration>
+					<xsd:enumeration value="Widowmaker"></xsd:enumeration>
+					<xsd:enumeration value="Dva"></xsd:enumeration>
+					<xsd:enumeration value="Orisa"></xsd:enumeration>
+					<xsd:enumeration value="Reinhardt"></xsd:enumeration>
+					<xsd:enumeration value="Roadhog"></xsd:enumeration>
+					<xsd:enumeration value="Winston"></xsd:enumeration>
+					<xsd:enumeration value="Zarya"></xsd:enumeration>
+					<xsd:enumeration value="Anna"></xsd:enumeration>
+					<xsd:enumeration value="Lucio"></xsd:enumeration>
+					<xsd:enumeration value="Mercy"></xsd:enumeration>
+					<xsd:enumeration value="Symmetra"></xsd:enumeration>
+					<xsd:enumeration value="Zenyatta"></xsd:enumeration>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	
+    <xsd:element name="avatar" type="avatarType"></xsd:element>
+</xsd:schema>

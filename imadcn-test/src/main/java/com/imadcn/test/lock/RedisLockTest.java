@@ -1,4 +1,4 @@
-package com.imadcn.lock.test;
+package com.imadcn.test.lock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.imadcn.framework.redis.lock.RedisLock;
@@ -21,20 +19,15 @@ public class RedisLockTest {
 	
 	private static ClassPathXmlApplicationContext context;
 	private static String configPath = "classpath:spring-config.xml";
-	private static RedisMessageListenerContainer container;
-	private static RedisTemplate<Object, Object> redisTemplate;
 	private static RedisLockManager redisLockManager;
 	private static ThreadPoolTaskExecutor executor;
 	
-	@SuppressWarnings("unchecked")
 	public RedisLockTest() {
 		context = new ClassPathXmlApplicationContext(new String[] { configPath });
 		context.start();
-		redisTemplate = (RedisTemplate<Object, Object>) context.getBean("redisTemplate");
-		container = context.getBean(RedisMessageListenerContainer.class);
 		executor = context.getBean(ThreadPoolTaskExecutor.class);
 
-		redisLockManager = new RedisLockManager(redisTemplate, container, "group");
+		redisLockManager = context.getBean(RedisLockManager.class);
 	}
 	
 	/*public void test1() {

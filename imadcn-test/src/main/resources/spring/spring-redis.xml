@@ -3,10 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:redis="http://www.springframework.org/schema/redis"
+	xmlns:lock="http://code.imadcn.com/schema/lock"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-						http://www.springframework.org/schema/redis http://www.springframework.org/schema/redis/spring-redis.xsd">
+						http://www.springframework.org/schema/redis http://www.springframework.org/schema/redis/spring-redis.xsd
+						http://code.imadcn.com/schema/lock http://code.imadcn.com/schema/lock.xsd">
 
 	<!-- redis线程池 -->
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
@@ -15,11 +17,6 @@
 		<property name="maxWaitMillis" value="${redis.pool.maxWaitMills}" />
 		<property name="testOnBorrow" value="false" />
 		<property name="testOnReturn" value="true" />
-	</bean>
-	
-	<bean id="jedisSentinelConfig" class="com.imadcn.framework.redis.config.JedisSentinelConfig">
-		<property name="masterName" value="${redis.sentinel.master}" />
-		<property name="sentinelAddrs" value="${redis.sentinel.nodes}" />
 	</bean>
 	
 	<!-- redis sentinel-->
@@ -52,8 +49,5 @@
 		<property name="topicSerializer" ref="stringRedisSerializer" />
 	</bean>
 	
-<!-- 	<bean id="jedisLockManager" class="com.imadcn.framework.redis.lock.jedis.JedisLockManager">
-		<constructor-arg index="0" ref="jedisPoolConfig" />
-		<constructor-arg index="1" ref="redisSentinelConfig" />
-	</bean> -->
+	<lock:config id="lockManager" group="${redis.lock.group.name}" redisTemplate="redisTemplate" messageContainer="redisMessageListenerContainer"/>
 </beans>
