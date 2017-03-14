@@ -27,4 +27,5 @@
 	<import resource="spring/spring-redis.xml" /> 
 	<import resource="spring/spring-beans.xml" />
 	<import resource="spring/spring-overwatch.xml"/>
+	<import resource="spring/mq/spring-mq.xml"/>
 </beans>
