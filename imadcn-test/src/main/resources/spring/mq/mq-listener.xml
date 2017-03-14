@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            			http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd">
+   	<!-- 连接工厂 -->
+	<bean id="mqConnectionFactory" class="org.springframework.amqp.rabbit.connection.CachingConnectionFactory">
+		<constructor-arg index="0" value="${mq.server.host}" />
+		<constructor-arg index="1" value="${mq.server.port}" />
+		<property name="virtualHost" value="${mq.server.virtualhost}" />
+		<property name="username" value="${mq.username}" />
+		<property name="password" value="${mq.password}" />
+	</bean> 			
+
+	<!-- 消息转换器 -->
+	<bean id="messageConverter" class="org.springframework.amqp.support.converter.SimpleMessageConverter" />
+	            			
+	<import resource="spring-mq-listener.xml"/>
+</beans>
