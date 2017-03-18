@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>imadcn-core</artifactId>
+			<artifactId>imadcn-framework-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
