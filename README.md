@@ -1,5 +1,2 @@
-
-.useful java develop tools
-***************************************
+useful java develop tools
 *powered by imadcn*
-***************************************
