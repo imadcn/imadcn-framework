@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>imadcn-core</module>
-		<module>imadcn-test</module>
-		<module>imadcn-demo</module>
+		<module>imadcn-framework-core</module>
+		<module>imadcn-framework-test</module>
+		<module>imadcn-framework-demo</module>
 	</modules>
 
 	<properties>
@@ -24,6 +24,7 @@
 		<org.springframework.security.version>4.1.0.RELEASE</org.springframework.security.version>
 		<org.springframework.amqp.version>1.5.4.RELEASE</org.springframework.amqp.version>
 		<org.springframework.data.redis.version>1.7.1.RELEASE</org.springframework.data.redis.version>
+		<org.springframework.integration.kafka.version>2.1.0.RELEASE</org.springframework.integration.kafka.version>
 		<!-- velocity -->
 		<org.apache.velocity.version>1.7</org.apache.velocity.version>
 		<org.apache.velocity-tools.version>2.0</org.apache.velocity-tools.version>
@@ -94,6 +95,10 @@
 		<com.dangdang.elastic-job.version>2.0.4</com.dangdang.elastic-job.version>
 		<!-- hibernate validation -->
 		<org.hibernate.validator.version>5.4.0.Final</org.hibernate.validator.version>
+		<!-- elastic search -->
+		<org.elasticsearch.client.version>5.2.2</org.elasticsearch.client.version>
+		<!-- kafka -->
+		<org.apache.kafka_2.11.version>0.10.2.0</org.apache.kafka_2.11.version>
 	</properties>
 
 	<dependencyManagement>
@@ -201,7 +206,12 @@
 				<artifactId>spring-data-redis</artifactId>
 				<version>${org.springframework.data.redis.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-kafka</artifactId>
+				<version>${org.springframework.integration.kafka.version}</version>
+			</dependency>
+			
 			<!-- velocity -->
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
@@ -551,6 +561,30 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
 				<version>${org.hibernate.validator.version}</version>
+			</dependency>
+			
+			<!-- elastic search -->
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>transport</artifactId>
+				<version>${org.elasticsearch.client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>rest</artifactId>
+				<version>${org.elasticsearch.client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>sniffer</artifactId>
+				<version>${org.elasticsearch.client.version}</version>
+			</dependency>
+			
+			<!-- kafka -->
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka_2.11</artifactId>
+				<version>${org.apache.kafka_2.11.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
