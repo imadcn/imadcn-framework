@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+            			
+	<bean id="kafkaConsumerFactory" class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${kafka.bootstrap.servers}" />
+				<entry key="group.id" value="group_imadcn_test" />
+				<entry key="enable.auto.commit" value="true" />
+				<entry key="auto.commit.interval.ms" value="100" />
+				<entry key="session.timeout.ms" value="15000" />
+				<entry key="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+				<entry key="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+			</map>
+		</constructor-arg><!-- 
+		<property name="keyDeserializer" ref="kafkaStringDeserializer" />
+		<property name="valueDeserializer" ref="kafkaStringDeserializer" /> -->
+	</bean>
+           
+	<bean id="kafkaMessageListenerContainer" class="org.springframework.kafka.listener.ConcurrentMessageListenerContainer">
+		<constructor-arg ref="kafkaConsumerFactory" />
+		<constructor-arg >
+			<bean class="org.springframework.kafka.listener.config.ContainerProperties">
+				<constructor-arg index="0" value="${kafka.consumer.topic}"/>
+				<property name="messageListener" ref="kafkaMessageListener" />
+			</bean>
+		</constructor-arg>
+		<property name="concurrency" value="3"/>
+	</bean> 
+	
+	<bean id="kafkaMessageListener" class="com.imadcn.demo.kafka.KafkaDemoListener" />
+</beans>

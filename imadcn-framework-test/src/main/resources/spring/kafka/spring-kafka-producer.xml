@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+            			
+	<bean id="kafkaProducerFactory" class="org.springframework.kafka.core.DefaultKafkaProducerFactory">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${kafka.bootstrap.servers}" />
+				<entry key="retries" value="0" />
+				<entry key="batch.size" value="16384" />
+				<entry key="linger.ms" value="1" />
+				<entry key="buffer.memory" value="33554432" />
+				<entry key="key.serializer" value="org.apache.kafka.common.serialization.StringSerializer"/>
+				<entry key="value.serializer" value="org.apache.kafka.common.serialization.StringSerializer"/>
+			</map>
+		</constructor-arg>
+<!-- 		<property name="keySerializer" ref="kafkaStringSerializer" />
+		<property name="valueSerializer" ref="kafkaStringSerializer" /> -->
+	</bean>
+
+	<bean id="kafkaTemplate" class="org.springframework.kafka.core.KafkaTemplate">
+		<constructor-arg ref="kafkaProducerFactory" />
+		<constructor-arg value="true" />
+		<property name="defaultTopic" value="${kafka.consumer.topic}" />
+	</bean>
+</beans>

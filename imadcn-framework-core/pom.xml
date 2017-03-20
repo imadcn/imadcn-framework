@@ -97,6 +97,10 @@
 			<artifactId>spring-data-redis</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+ 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-kafka</artifactId>
 		</dependency>
@@ -406,6 +410,13 @@
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.11</artifactId>
 		</dependency>
+		
+		<!-- alibaba canal.otter -->
+		<dependency>
+		    <groupId>com.alibaba.otter</groupId>
+		    <artifactId>canal.client</artifactId>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>

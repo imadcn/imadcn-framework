@@ -22,10 +22,10 @@
 		<property name="fileEncoding" value="utf-8" />
 	</bean>
 	<!-- 自动扫描的包名 -->
-	<context:component-scan base-package="com.imadcn.framework.*" /> 
+	<context:component-scan base-package="com.imadcn.framework.*, com.imadcn.demo.*, com.imadcn.test.*" /> 
 	
-	<import resource="spring/spring-redis.xml" /> 
+	<import resource="spring/spring-redis.xml" />
 	<import resource="spring/spring-beans.xml" />
-	<import resource="spring/spring-overwatch.xml"/>
 	<import resource="spring/mq/spring-mq.xml"/>
+	<import resource="spring/kafka/spring-kafka.xml"/>
 </beans>

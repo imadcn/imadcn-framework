@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>imadcn-framework-core</module>
-		<module>imadcn-framework-test</module>
-		<module>imadcn-framework-demo</module>
+		<module>imadcn-core</module>
+		<module>imadcn-test</module>
+		<module>imadcn-demo</module>
 	</modules>
 
 	<properties>
@@ -22,7 +22,8 @@
 		<!-- spring -->
 		<org.springframework.version>4.2.6.RELEASE</org.springframework.version>
 		<org.springframework.security.version>4.1.0.RELEASE</org.springframework.security.version>
-		<org.springframework.amqp.version>1.5.4.RELEASE</org.springframework.amqp.version>
+		<org.springframework.amqp.version>1.6.5.RELEASE</org.springframework.amqp.version>
+		<org.springframework.kafka.version>1.1.2.RELEASE</org.springframework.kafka.version>
 		<org.springframework.data.redis.version>1.7.1.RELEASE</org.springframework.data.redis.version>
 		<org.springframework.integration.kafka.version>2.1.0.RELEASE</org.springframework.integration.kafka.version>
 		<!-- velocity -->
@@ -99,6 +100,8 @@
 		<org.elasticsearch.client.version>5.2.2</org.elasticsearch.client.version>
 		<!-- kafka -->
 		<org.apache.kafka_2.11.version>0.10.2.0</org.apache.kafka_2.11.version>
+		<!-- otter(canal client) -->
+		<com.alibaba.otter.canal.client.version>1.0.23</com.alibaba.otter.canal.client.version>
 	</properties>
 
 	<dependencyManagement>
@@ -205,6 +208,11 @@
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-redis</artifactId>
 				<version>${org.springframework.data.redis.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${org.springframework.kafka.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.integration</groupId>
@@ -585,6 +593,13 @@
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka_2.11</artifactId>
 				<version>${org.apache.kafka_2.11.version}</version>
+			</dependency>
+			
+			<!-- alibaba canal.otter -->
+			<dependency>
+			    <groupId>com.alibaba.otter</groupId>
+			    <artifactId>canal.client</artifactId>
+			    <version>${com.alibaba.otter.canal.client.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
