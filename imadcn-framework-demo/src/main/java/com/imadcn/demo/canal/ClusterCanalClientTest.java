@@ -18,7 +18,7 @@ public class ClusterCanalClientTest extends AbstractCanalClientTest {
     }
 
     public static void main(String args[]) {
-        String destination = "example";
+        String destination = "instance1";
 
         // 基于固定canal server的地址，建立链接，其中一台server发生crash，可以支持failover
         // CanalConnector connector = CanalConnectors.newClusterConnector(
@@ -28,7 +28,7 @@ public class ClusterCanalClientTest extends AbstractCanalClientTest {
         // "stability_test", "", "");
 
         // 基于zookeeper动态获取canal server的地址，建立链接，其中一台server发生crash，可以支持failover
-        CanalConnector connector = CanalConnectors.newClusterConnector("127.0.0.1:2181", destination, "", "");
+        CanalConnector connector = CanalConnectors.newClusterConnector("10.0.0.111:2181,10.0.0.112:2181,10.0.0.113:2181", destination, "", "");
 
         final ClusterCanalClientTest clientTest = new ClusterCanalClientTest(destination);
         clientTest.setConnector(connector);

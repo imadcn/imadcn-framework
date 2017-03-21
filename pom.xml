@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>imadcn-core</module>
-		<module>imadcn-test</module>
-		<module>imadcn-demo</module>
+		<module>imadcn-framework-core</module>
+		<module>imadcn-framework-test</module>
+		<module>imadcn-framework-demo</module>
 	</modules>
 
 	<properties>
