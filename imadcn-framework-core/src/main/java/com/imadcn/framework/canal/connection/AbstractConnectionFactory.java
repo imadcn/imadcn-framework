@@ -13,8 +13,6 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory, Di
 	private String destination;
 	private String username;
 	private String password;
-	private long soTimeout;
-	private String filter;
 
 	private volatile String beanName;
 
@@ -45,14 +43,6 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory, Di
 	@Override
 	public String getPassword() {
 		return this.password;
-	}
-
-	public long getSoTimeout() {
-		return soTimeout;
-	}
-
-	public String getFilter() {
-		return filter;
 	}
 
 	@Override

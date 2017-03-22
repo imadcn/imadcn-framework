@@ -1,5 +1,7 @@
 package com.imadcn.framework.canal.connection;
 
+import com.alibaba.otter.canal.client.CanalConnector;
+
 /**
  * Canal Connection Factory
  * @author imadcn
@@ -7,13 +9,11 @@ package com.imadcn.framework.canal.connection;
  */
 public interface ConnectionFactory {
 	
+	CanalConnector createCanalConnector();
+	
 	String getDestination();
 	
 	String getUsername();
 	
 	String getPassword();
-	
-	long getSoTimeout();
-	
-	String getFilter();
 }

@@ -1,6 +1,5 @@
 package com.imadcn.framework.canal.listener;
 
-import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -12,10 +11,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.CollectionUtils;
 
-import com.alibaba.otter.canal.protocol.Message;
+import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.protocol.CanalEntry.Column;
 import com.alibaba.otter.canal.protocol.CanalEntry.Entry;
 import com.alibaba.otter.canal.protocol.CanalEntry.EntryType;
@@ -24,6 +22,7 @@ import com.alibaba.otter.canal.protocol.CanalEntry.RowChange;
 import com.alibaba.otter.canal.protocol.CanalEntry.RowData;
 import com.alibaba.otter.canal.protocol.CanalEntry.TransactionBegin;
 import com.alibaba.otter.canal.protocol.CanalEntry.TransactionEnd;
+import com.alibaba.otter.canal.protocol.Message;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.imadcn.framework.canal.connection.CanalAccessor;
 import com.imadcn.framework.canal.connection.ConnectionFactory;
@@ -33,12 +32,13 @@ import com.imadcn.framework.canal.connection.ZkClusterConnetionFactory;
 import com.imadcn.framework.canal.listener.db.DclMessageListener;
 import com.imadcn.framework.canal.listener.db.DdlMessageListener;
 import com.imadcn.framework.canal.listener.db.DmlMessageListener;
-import com.rabbitmq.client.Channel;
 
 public abstract class AbstractMessageListenerContainer extends CanalAccessor
 		implements MessageListenerContainer, ApplicationContextAware, BeanNameAware, DisposableBean, SmartLifecycle {
 	
     protected static final String SEP = SystemUtils.LINE_SEPARATOR;
+    
+    private volatile CanalConnector canalConnector;
 
 	private volatile Object messageListener;
 
@@ -57,6 +57,16 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	private volatile boolean initialized;
 
 	private volatile ApplicationContext applicationContext;
+	
+	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
+	protected Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+        public void uncaughtException(Thread t, Throwable e) {
+            logger.error("parse events has an error", e);
+        }
+    };
+    
+    protected Thread thread = null;
 
 	/**
 	 * Set the message listener implementation to register. This can be either a
@@ -116,8 +126,7 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	 * meaning that this container starts as late as possible and stops as soon
 	 * as possible.
 	 *
-	 * @param phase
-	 *            The phase.
+	 * @param phase The phase.
 	 */
 	public void setPhase(int phase) {
 		this.phase = phase;
@@ -165,12 +174,12 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 			if (targetConnectionFactory != null) {
 				return targetConnectionFactory;
 			}
-		} else if (connectionFactory instanceof SimpleConnectionFactory) {
+		} else if (connectionFactory instanceof SocketClusterConnectionFactory) {
 			ConnectionFactory targetConnectionFactory = ((SocketClusterConnectionFactory) connectionFactory);
 			if (targetConnectionFactory != null) {
 				return targetConnectionFactory;
 			}
-		} else if (connectionFactory instanceof SimpleConnectionFactory) {
+		} else if (connectionFactory instanceof ZkClusterConnetionFactory) {
 			ConnectionFactory targetConnectionFactory = ((ZkClusterConnetionFactory) connectionFactory);
 			if (targetConnectionFactory != null) {
 				return targetConnectionFactory;
@@ -266,7 +275,16 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	 * @throws Exception
 	 *             Any Exception.
 	 */
-	protected abstract void doInitialize() throws Exception;
+	protected void doInitialize() throws Exception {
+		thread = new Thread(new Runnable() {
+            public void run() {
+                process();
+            }
+        });
+        thread.setUncaughtExceptionHandler(handler);
+        thread.start();
+        running = true;
+	}
 
 	/**
 	 * Close the registered invokers.
@@ -279,7 +297,9 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	 * 
 	 * @see #shutdown()
 	 */
-	protected abstract void doShutdown();
+	protected void doShutdown() {
+		doStop();
+	}
 
 	/**
 	 * @return Whether this container is currently active, that is, whether it
@@ -319,8 +339,7 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	/**
 	 * Start this container, and notify all invoker tasks.
 	 * 
-	 * @throws Exception
-	 *             if thrown by Rabbit API methods
+	 * @throws Exception if thrown by Rabbit API methods
 	 */
 	protected void doStart() throws Exception {
 		// Reschedule paused tasks, if any.
@@ -362,6 +381,18 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 	 * implementation does nothing, but subclasses may override.
 	 */
 	protected void doStop() {
+		if (!running) {
+			return;
+		}
+        running = false;
+        if (thread != null) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+        MDC.remove("destination");
 	}
 
 	/**
@@ -382,11 +413,11 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
         int batchSize = 5 * 1024;
         while (running) {
             try {
-                MDC.put("destination", destination);
-                connector.connect();
-                connector.subscribe();
+                MDC.put("destination", getConnectionFactory().getDestination());
+                getCanalConnector().connect();
+                getCanalConnector().subscribe();
                 while (running) {
-                    Message message = connector.getWithoutAck(batchSize); // 获取指定数量的数据
+                    Message message = getCanalConnector().getWithoutAck(batchSize); // 获取指定数量的数据
                     long batchId = message.getId();
                     int size = message.getEntries().size();
                     if (batchId == -1 || size == 0) {
@@ -399,13 +430,13 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
                         printEntry(message.getEntries());
                     }
 
-                    connector.ack(batchId); // 提交确认
+                    getCanalConnector().ack(batchId); // 提交确认
                     // connector.rollback(batchId); // 处理失败, 回滚数据
                 }
             } catch (Exception e) {
                 logger.error("process error!", e);
             } finally {
-                connector.disconnect();
+            	getCanalConnector().disconnect();
                 MDC.remove("destination");
             }
         }
@@ -425,8 +456,7 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
         }
 
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        logger.info(context_format, new Object[] { batchId, size, memsize, format.format(new Date()), startPosition,
-                endPosition });
+        logger.info(context_format, new Object[] { batchId, size, memsize, format.format(new Date()), startPosition, endPosition });
     }
 
     protected String buildPositionForDump(Entry entry) {
@@ -524,6 +554,33 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
         }
     }
 
+	private CanalConnector getCanalConnector() {
+		if (canalConnector == null) {
+			synchronized (this) {
+				if (canalConnector == null) {
+					this.canalConnector =  getConnectionFactory().createCanalConnector();
+				}
+			}
+		}
+		return canalConnector;
+	}
 	
+    protected static String                   context_format     = null;
+    protected static String                   row_format         = null;
+    protected static String                   transaction_format = null;
 
+    static {
+        context_format = SEP + "****************************************************" + SEP;
+        context_format += "* Batch Id: [{}] ,count : [{}] , memsize : [{}] , Time : {}" + SEP;
+        context_format += "* Start : [{}] " + SEP;
+        context_format += "* End : [{}] " + SEP;
+        context_format += "****************************************************" + SEP;
+
+        row_format = SEP
+                     + "----------------> binlog[{}:{}] , name[{},{}] , eventType : {} , executeTime : {} , delay : {}ms"
+                     + SEP;
+
+        transaction_format = SEP + "================> binlog[{}:{}] , executeTime : {} , delay : {}ms" + SEP;
+
+    }
 }

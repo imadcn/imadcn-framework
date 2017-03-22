@@ -75,12 +75,10 @@ public class AbstractCanalClient {
     protected void start() {
         Assert.notNull(connector, "connector is null");
         thread = new Thread(new Runnable() {
-
             public void run() {
                 process();
             }
         });
-
         thread.setUncaughtExceptionHandler(handler);
         thread.start();
         running = true;

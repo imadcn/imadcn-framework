@@ -1,9 +1,13 @@
 package com.imadcn.framework.canal.connection;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+
+import com.alibaba.otter.canal.client.CanalConnector;
 
 public abstract class CanalAccessor implements InitializingBean {
 	
@@ -25,6 +29,10 @@ public abstract class CanalAccessor implements InitializingBean {
 	 */
 	public ConnectionFactory getConnectionFactory() {
 		return this.connectionFactory;
+	}
+	
+	protected CanalConnector createCanalConnector() throws IOException {
+		return this.connectionFactory.createCanalConnector();
 	}
 
 	@Override

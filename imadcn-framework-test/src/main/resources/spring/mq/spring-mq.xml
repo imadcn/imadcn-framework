@@ -17,6 +17,6 @@
 	<!-- 消息转换器 -->
 	<bean id="messageConverter" class="org.springframework.amqp.support.converter.SimpleMessageConverter" />
 	            			
-	<import resource="spring-mq-listener.xml"/>
+	<import resource="spring-mq-consumer.xml"/>
 	<import resource="spring-mq-producer.xml"/>
 </beans>
