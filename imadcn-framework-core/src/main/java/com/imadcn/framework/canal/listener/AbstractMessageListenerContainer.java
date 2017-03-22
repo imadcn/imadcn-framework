@@ -527,15 +527,7 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
                 }
 
                 for (RowData rowData : rowChage.getRowDatasList()) {
-                    if (eventType == EventType.DELETE) {
-                        printColumn(rowData.getBeforeColumnsList());
-                    } else if (eventType == EventType.INSERT) {
-                        printColumn(rowData.getAfterColumnsList());
-                    } else if (eventType == EventType.UPDATE) {
-                        printColumn(rowData.getAfterColumnsList());
-                    } else {
-                    	printColumn(rowData.getAfterColumnsList());
-                    }
+                    invokeListener(eventType, rowData);
                 }
             }
         }
@@ -564,6 +556,29 @@ public abstract class AbstractMessageListenerContainer extends CanalAccessor
 		}
 		return canalConnector;
 	}
+	
+	private void invokeListener(EventType eventType, RowData rowData) {
+		Object listener = getMessageListener();
+		if (listener instanceof DmlMessageListener) {
+			DmlMessageListener dmlListener = (DmlMessageListener) listener;
+			if (eventType == EventType.DELETE) {
+				dmlListener.deleteTable(rowData);
+            } else if (eventType == EventType.INSERT) {
+                dmlListener.insertTable(rowData);
+            } else if (eventType == EventType.UPDATE) {
+                dmlListener.updateTable(rowData);
+            } else {
+            	logger.warn("unkown operation, print column only");
+            	printColumn(rowData.getAfterColumnsList());
+            }
+		} else if (listener instanceof DclMessageListener) {
+			
+		} else if (listener instanceof DdlMessageListener) {
+			
+		} else {
+			
+		}
+	} 
 	
     protected static String                   context_format     = null;
     protected static String                   row_format         = null;
