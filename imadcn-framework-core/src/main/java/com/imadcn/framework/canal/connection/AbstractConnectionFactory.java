@@ -58,4 +58,16 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory, Di
 			return super.toString();
 		}
 	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }
