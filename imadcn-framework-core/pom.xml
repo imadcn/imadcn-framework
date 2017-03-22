@@ -406,17 +406,16 @@
 		</dependency>
 		
 		<!-- kafka -->
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.11</artifactId>
-		</dependency>
+		</dependency> -->
 		
 		<!-- alibaba canal.otter -->
 		<dependency>
 		    <groupId>com.alibaba.otter</groupId>
 		    <artifactId>canal.client</artifactId>
 		</dependency>
-		
 	</dependencies>
 	
 	<build>

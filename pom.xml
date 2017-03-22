@@ -600,6 +600,12 @@
 			    <groupId>com.alibaba.otter</groupId>
 			    <artifactId>canal.client</artifactId>
 			    <version>${com.alibaba.otter.canal.client.version}</version>
+<!-- 			    <exclusions>
+			    	<exclusion>
+			    		<groupId>com.github.sgroschupf</groupId>
+						<artifactId>zkclient</artifactId>
+			    	</exclusion>
+			    </exclusions> -->
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
