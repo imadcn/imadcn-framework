@@ -8,8 +8,9 @@
 
 	<modules>
 		<module>imadcn-framework-core</module>
-		<module>imadcn-framework-test</module>
 		<module>imadcn-framework-demo</module>
+		<module>imadcn-framework-web</module>
+		<module>imadcn-framework-test</module>
 	</modules>
 
 	<properties>
@@ -20,8 +21,8 @@
 		<javax.servlet.servlet-api.version>3.1.0</javax.servlet.servlet-api.version>
 		<javax.servlet.jsp-api.version>2.2</javax.servlet.jsp-api.version>
 		<!-- spring -->
-		<org.springframework.version>4.2.6.RELEASE</org.springframework.version>
-		<org.springframework.security.version>4.1.0.RELEASE</org.springframework.security.version>
+		<org.springframework.version>4.3.7.RELEASE</org.springframework.version>
+		<org.springframework.security.version>4.2.1.RELEASE</org.springframework.security.version>
 		<org.springframework.amqp.version>1.6.5.RELEASE</org.springframework.amqp.version>
 		<org.springframework.kafka.version>1.1.2.RELEASE</org.springframework.kafka.version>
 		<org.springframework.data.redis.version>1.7.1.RELEASE</org.springframework.data.redis.version>
@@ -501,6 +502,12 @@
 				<groupId>com.alibaba</groupId>
 				<artifactId>dubbo</artifactId>
 				<version>${com.alibaba.dubbo.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<!-- zkclient -->
@@ -593,13 +600,6 @@
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka_2.11</artifactId>
 				<version>${org.apache.kafka_2.11.version}</version>
-			</dependency>
-			
-			<!-- alibaba canal.otter -->
-			<dependency>
-			    <groupId>com.alibaba.otter</groupId>
-			    <artifactId>canal.client</artifactId>
-			    <version>${com.alibaba.otter.canal.client.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

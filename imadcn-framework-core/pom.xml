@@ -411,12 +411,6 @@
 			<artifactId>kafka_2.11</artifactId>
 		</dependency>
 		
-		<!-- alibaba canal.otter -->
-		<dependency>
-		    <groupId>com.alibaba.otter</groupId>
-		    <artifactId>canal.client</artifactId>
-		</dependency>
-		
 	</dependencies>
 	
 	<build>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+
+	<display-name>imadcn-framework-web</display-name>
+
+	<!-- Spring ApplicationContext配置文件的路径,可使用通配符，用于后面的Spring Context Loader -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring-config.xml</param-value>
+	</context-param>
+
+	<!-- Spring MVC Servlet -->
+	<servlet>
+		<servlet-name>spring-dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value></param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring-dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<!--Spring ApplicationContext 载入 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+<!-- 	<welcome-file-list>
+		<welcome-file>index.htm</welcome-file>
+	</welcome-file-list> -->
+
+	<!-- 出错页面定义 -->
+	<!-- <error-page> <error-code>500</error-code> <location>/error.htm</location> 
+		</error-page> <error-page> <error-code>405</error-code> <location>/error.htm</location> 
+		</error-page> <error-page> <error-code>403</error-code> <location>/error.htm?errcode=403</location> 
+		</error-page> <error-page> <error-code>404</error-code> <location>/error.htm?errcode=404</location> 
+		</error-page> -->
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>DisableUnsecureHttpActions</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>DELETE</http-method>
+			<http-method>PUT</http-method>
+			<http-method>HEAD</http-method>
+			<http-method>TRACE</http-method>
+			<http-method>OPTIONS</http-method>
+		</web-resource-collection>
+		<auth-constraint />
+	</security-constraint>
+</web-app>
