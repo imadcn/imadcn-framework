@@ -1,4 +1,4 @@
-package com.imadcn.framework.controller;
+package com.imadcn.framework.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
