@@ -80,9 +80,7 @@
 		<!-- dubbo -->
 		<com.alibaba.dubbo.version>2.5.3</com.alibaba.dubbo.version>
 		<!-- zkclient -->
-
-		<!-- tbschedule -->
-		<com.taobao.tbschedule.version>3.2.18</com.taobao.tbschedule.version>
+		
 		<!-- mina -->
 		<org.apache.mina.version>2.0.13</org.apache.mina.version>
 		<!-- httpclient -->
@@ -511,13 +509,6 @@
 			</dependency>
 
 			<!-- zkclient -->
-
-			<!-- tbschedule -->
-			<dependency>
-				<groupId>com.taobao.pamirs.schedule</groupId>
-				<artifactId>tbschedule</artifactId>
-				<version>${com.taobao.tbschedule.version}</version>
-			</dependency>
 
 			<!-- mina -->
 			<!-- <dependency> <groupId>org.apache.mina</groupId> <artifactId>mina-core</artifactId> 

@@ -341,12 +341,6 @@
 
 		<!-- zkclient -->
 
-		<!-- tbschedule -->
-		<dependency>
-			<groupId>com.taobao.pamirs.schedule</groupId>
-			<artifactId>tbschedule</artifactId>
-		</dependency>
-
 		<!-- httpclient -->
 <!-- 		<dependency>
 			<groupId>org.apache.httpclient</groupId>
