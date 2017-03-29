@@ -307,7 +307,7 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	}
 	
 	private String getEntryName() { // 锁定资源ID
-		return uuid + ":" + getRedisKey();
+		return uuid + ":" + getRedisKey() + Thread.currentThread().getId();
 	}
 	
 	public void setRedisTemplate(RedisTemplate<Object, Object> redisTemplate) {
