@@ -69,6 +69,6 @@ public class CommandParser {
 		String regex = "给(.)+来一发(.)+";
 		String[] commandKeys={"给", "来一发"};
 */		
-//		System.err.println(JSON.toJSONString(parse(command, regex, commandKeys)));
+		System.err.println(JSON.toJSONString(parse(command, regex, commandKeys)));
 	}
 }
