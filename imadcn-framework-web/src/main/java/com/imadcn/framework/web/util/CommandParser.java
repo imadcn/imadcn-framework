@@ -63,9 +63,12 @@ public class CommandParser {
 		String command = "/tt somke @iMad 100";
 		String regex = "/tt somke (.)+ \\d+";
 		String[] commandKeys={"/tt somke ", " "};
+		String[] tmp = command.split(regex);
+		System.out.println(JSON.toJSONString(tmp));
 /*		String command = "给 @ i M a d 来一发!!!";
 		String regex = "给(.)+来一发(.)+";
 		String[] commandKeys={"给", "来一发"};
-*/		System.err.println(JSON.toJSONString(parse(command, regex, commandKeys)));
+*/		
+//		System.err.println(JSON.toJSONString(parse(command, regex, commandKeys)));
 	}
 }

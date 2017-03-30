@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.config;
+package com.imadcn.framework.config.redis;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;

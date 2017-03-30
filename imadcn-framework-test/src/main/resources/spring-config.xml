@@ -26,7 +26,4 @@
 	
 	<import resource="spring/spring-redis.xml" />
 	<import resource="spring/spring-beans.xml" />
-	<import resource="spring/mq/spring-mq.xml"/>
-	<import resource="spring/kafka/spring-kafka.xml"/>
-	<import resource="spring/canal/spring-canal.xml"/>
 </beans>

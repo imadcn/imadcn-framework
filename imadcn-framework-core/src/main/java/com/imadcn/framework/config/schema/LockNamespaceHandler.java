@@ -1,4 +1,4 @@
-package com.imadcn.framework.config.spring.schema;
+package com.imadcn.framework.config.schema;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

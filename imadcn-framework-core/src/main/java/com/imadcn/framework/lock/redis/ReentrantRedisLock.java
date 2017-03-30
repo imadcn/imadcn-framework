@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock.spring;
+package com.imadcn.framework.lock.redis;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -19,8 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-import com.imadcn.framework.redis.lock.RedisLock;
-import com.imadcn.framework.redis.pubsub.LockPubSub;
+import com.imadcn.framework.lock.redis.pubsub.LockPubSub;
 
 /**
  * 可重入的分布式锁, 基于redis
@@ -121,7 +120,7 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 					LOGGER.debug("[{}] acquire without tlls, latch id [{}]", entry.getTag(), entry.getLatch());
 					entry.getLatch().acquire(); 
 				}
-				LOGGER.debug("await {} ms, and ended by {}", ttl, entry.getTag());
+				LOGGER.info("await {} ms, and ended by {}", ttl, entry.getTag());
 			}
 		} finally {
 			unsubscribe(subscribeEntry); // 等他他人解锁，切自己锁定成功，取消监听解锁事件

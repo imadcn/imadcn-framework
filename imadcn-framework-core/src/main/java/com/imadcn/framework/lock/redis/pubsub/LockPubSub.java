@@ -1,9 +1,9 @@
-package com.imadcn.framework.redis.pubsub;
+package com.imadcn.framework.lock.redis.pubsub;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.imadcn.framework.redis.lock.spring.RedisLockEntry;
+import com.imadcn.framework.lock.redis.RedisLockEntry;
 
 /**
  * 基于redis发布订阅功能，实现锁资源释放监听

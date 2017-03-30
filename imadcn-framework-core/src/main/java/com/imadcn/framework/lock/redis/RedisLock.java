@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.lock;
+package com.imadcn.framework.lock.redis;
 
 import java.util.concurrent.locks.Lock;
 

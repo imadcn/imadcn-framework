@@ -2,6 +2,7 @@ package com.imadcn.test.lock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -9,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.imadcn.framework.redis.lock.RedisLock;
-import com.imadcn.framework.redis.lock.spring.RedisLockManager;
+import com.imadcn.framework.lock.redis.RedisLock;
+import com.imadcn.framework.lock.redis.RedisLockManager;
 import com.imadcn.framework.util.UIDUtil;
 
 public class RedisLockTest {
@@ -93,6 +94,18 @@ public class RedisLockTest {
 			lock.unlock();
 		}
 	}
+	
+	public void test4() {
+		final String key = UIDUtil.noneDashUuid();
+		for (int j = 0; j < execNum; j++) {
+			executor.execute(new Runnable() {
+				@Override
+				public void run() {
+					test1_1(key);
+				}
+			});
+		}
+	} 
 
 	private void test1_1(String key) {
 		try {
@@ -100,7 +113,7 @@ public class RedisLockTest {
 			// print(key);
 			RedisLock lock = redisLockManager.getLock(key);
 			lock.lock();
-			long sleepElapse = 0; // 50 * 60 * 1000 + new Random().nextInt(500);
+			long sleepElapse = new Random().nextInt(5000);
 			queue.add(key + ":" + threadId);
 			LOGGER.info(String.format("key [%s] locked in thread id [%s]. try to sleep [%s] ms", key, threadId, sleepElapse));
 			long beginTime = System.currentTimeMillis();
@@ -195,6 +208,6 @@ public class RedisLockTest {
 	
 	public static void main(String[] args) throws Exception {
 		RedisLockTest t = new RedisLockTest();
-		t.test3();
+		t.test1();
 	}
 }

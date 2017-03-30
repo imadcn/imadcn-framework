@@ -1,8 +1,8 @@
-package com.imadcn.framework.redis.lock.spring;
+package com.imadcn.framework.lock.redis;
 
 import java.util.concurrent.Semaphore;
 
-import com.imadcn.framework.redis.pubsub.PubSubEntry;
+import com.imadcn.framework.lock.redis.pubsub.PubSubEntry;
 
 /**
  * 锁资源监听实例

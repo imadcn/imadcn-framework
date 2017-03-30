@@ -1,4 +1,4 @@
-package com.imadcn.framework.config.spring.schema;
+package com.imadcn.framework.config.schema;
 
 import java.util.Random;
 
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.imadcn.framework.redis.lock.spring.RedisLockManager;
+import com.imadcn.framework.lock.redis.RedisLockManager;
 
 public class LockBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 

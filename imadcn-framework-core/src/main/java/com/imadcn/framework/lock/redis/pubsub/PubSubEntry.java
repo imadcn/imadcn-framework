@@ -1,4 +1,4 @@
-package com.imadcn.framework.redis.pubsub;
+package com.imadcn.framework.lock.redis.pubsub;
 
 public interface PubSubEntry<E> {
 	
