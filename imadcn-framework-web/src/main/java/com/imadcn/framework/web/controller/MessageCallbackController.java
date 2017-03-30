@@ -40,7 +40,4 @@ public class MessageCallbackController {
 			logger.error("", e);
 		}
 	}
-	
-	public static void main(String[] args) {
-	}
 }
