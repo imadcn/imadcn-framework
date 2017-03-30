@@ -8,14 +8,12 @@ import java.security.NoSuchAlgorithmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.imadcn.framework.httpclient.HttpClientHelper;
 
 public class SmartqqHelper {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SmartqqHelper.class);
 
-	@JSONField()
 	private static String host;
 	private static int port;
 	
