@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSON;
 import com.imadcn.framework.web.core.Message;
 import com.imadcn.framework.web.core.PostType;
-import com.imadcn.framework.web.filter.ReceiveMessageExecutor;
+import com.imadcn.framework.web.filter.MessageContainer;
 
 @Controller
 @RequestMapping("/message/callback")
@@ -24,7 +24,7 @@ public class MessageCallbackController {
 	protected static final Logger logger = LoggerFactory.getLogger(MessageCallbackController.class);
 	
 	@Autowired
-	private ReceiveMessageExecutor rcvMsgExceutor;
+	private MessageContainer rcvMsgExceutor;
 	
 	@RequestMapping("/receive")
 	public void receive(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, String> data) {

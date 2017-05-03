@@ -9,7 +9,7 @@ import com.imadcn.framework.web.core.Message;
 import com.imadcn.framework.web.core.Processor;
 
 @Component
-public class ReceiveMessageExecutor {
+public class MessageContainer {
 	
 	@Autowired(required = false)
 	private List<MessageFilter> filters;
@@ -19,7 +19,7 @@ public class ReceiveMessageExecutor {
 			for (MessageFilter mf : filters) {
 				Processor p = mf.doFilter(message);
 				if (p != null) {
-					p.onCall(message);
+					p.onMessage(message);
 					break;
 				}
 			}

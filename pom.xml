@@ -14,9 +14,9 @@
 	</modules>
 
 	<properties>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-	
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
 		<!-- servlet -->
 		<javax.servlet.servlet-api.version>3.1.0</javax.servlet.servlet-api.version>
 		<javax.servlet.jsp-api.version>2.2</javax.servlet.jsp-api.version>
@@ -27,6 +27,7 @@
 		<org.springframework.kafka.version>1.1.2.RELEASE</org.springframework.kafka.version>
 		<org.springframework.data.redis.version>1.7.1.RELEASE</org.springframework.data.redis.version>
 		<org.springframework.integration.kafka.version>2.1.0.RELEASE</org.springframework.integration.kafka.version>
+		<org.springframework.data.es.version>2.1.1.RELEASE</org.springframework.data.es.version>
 		<!-- velocity -->
 		<org.apache.velocity.version>1.7</org.apache.velocity.version>
 		<org.apache.velocity-tools.version>2.0</org.apache.velocity-tools.version>
@@ -80,7 +81,7 @@
 		<!-- dubbo -->
 		<com.alibaba.dubbo.version>2.5.3</com.alibaba.dubbo.version>
 		<!-- zkclient -->
-		
+
 		<!-- mina -->
 		<org.apache.mina.version>2.0.13</org.apache.mina.version>
 		<!-- httpclient -->
@@ -218,7 +219,12 @@
 				<artifactId>spring-integration-kafka</artifactId>
 				<version>${org.springframework.integration.kafka.version}</version>
 			</dependency>
-			
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-elasticsearch</artifactId>
+				<version>${org.springframework.data.es.version}</version>
+			</dependency>
+
 			<!-- velocity -->
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
@@ -505,6 +511,10 @@
 						<groupId>org.springframework</groupId>
 						<artifactId>spring</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>org.jboss.netty</groupId>
+						<artifactId>netty</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 
@@ -518,11 +528,8 @@
 				<version>${org.apache.mina.version}</version> </dependency> -->
 
 			<!-- httpclient -->
-<!-- 			<dependency>
-				<groupId>org.apache.httpclient</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>${org.apache.httpclient.version}</version>
-			</dependency> -->
+			<!-- <dependency> <groupId>org.apache.httpclient</groupId> <artifactId>httpclient</artifactId> 
+				<version>${org.apache.httpclient.version}</version> </dependency> -->
 
 			<!-- captcha -->
 			<dependency>
@@ -542,14 +549,14 @@
 				<artifactId>sharding-jdbc-config-spring</artifactId>
 				<version>${com.dangdang.sharding-jdbc.version}</version>
 			</dependency>
-			
+
 			<!-- redisson -->
 			<dependency>
 				<groupId>org.redisson</groupId>
 				<artifactId>redisson</artifactId>
 				<version>${org.redisson.version}</version>
 			</dependency>
-			
+
 			<!-- elastic-job -->
 			<dependency>
 				<groupId>com.dangdang</groupId>
@@ -561,21 +568,21 @@
 				<artifactId>elastic-job-lite-spring</artifactId>
 				<version>${com.dangdang.elastic-job.version}</version>
 			</dependency>
-			
+
 			<!-- hibernate validation -->
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
 				<version>${org.hibernate.validator.version}</version>
 			</dependency>
-			
+
 			<!-- elastic search -->
-			<dependency>
+ 			<dependency>
 				<groupId>org.elasticsearch.client</groupId>
 				<artifactId>transport</artifactId>
 				<version>${org.elasticsearch.client.version}</version>
 			</dependency>
-			<dependency>
+<!--			<dependency>
 				<groupId>org.elasticsearch.client</groupId>
 				<artifactId>rest</artifactId>
 				<version>${org.elasticsearch.client.version}</version>
@@ -584,8 +591,8 @@
 				<groupId>org.elasticsearch.client</groupId>
 				<artifactId>sniffer</artifactId>
 				<version>${org.elasticsearch.client.version}</version>
-			</dependency>
-			
+			</dependency> -->
+
 			<!-- kafka -->
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
