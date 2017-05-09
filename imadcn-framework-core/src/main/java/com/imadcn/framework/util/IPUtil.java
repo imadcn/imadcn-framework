@@ -185,7 +185,7 @@ public class IPUtil {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		String ipAddr = "192.168.8.1";
+		/*String ipAddr = "192.168.8.1";
 
 		byte[] bytearr = ipToBytesByInet(ipAddr);
 
@@ -233,6 +233,7 @@ public class IPUtil {
 		System.out.println(ipAddr1 + " , " + ipMask1 + "  --> int地址段 ：[ " + ipscope1[0] + "," + ipscope1[1] + " ]");
 
 		System.out.println(ipAddr1 + " , " + ipMask1 + "  --> IP地址段 ：[ " + intToIp(ipscope1[0]) + "," + intToIp(ipscope1[1]) + " ]");
-
+*/
+		System.out.println(IPUtil.ipToInt("128.0.0.1"));
 	}
 }

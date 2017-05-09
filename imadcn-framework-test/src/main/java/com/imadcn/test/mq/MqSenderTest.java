@@ -7,7 +7,7 @@ import com.imadcn.demo.rabbitmq.Sender;
 public class MqSenderTest {
 	
 	private ClassPathXmlApplicationContext context;
-	private String configPath = "classpath:spring-config-mq-producer.xml";
+	private String configPath = "classpath:spring-config.xml";
 	private Sender sender;
 	
 	public MqSenderTest() {
