@@ -28,9 +28,9 @@ import java.util.TimeZone;
  * @author Johan Rydell, PortWise, Inc.
  */
 
-public class TOTP {
+public class OathTOTP {
 
-	private TOTP() {
+	private OathTOTP() {
 	}
 
 	/**
