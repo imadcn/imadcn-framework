@@ -1,12 +1,11 @@
 package com.imadcn.framework.util;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 public class DigitCode {
 	
 	public static final String KEY = "3132333435363738393031323334353637383930" + "3132333435363738393031323334353637383930" + "3132333435363738393031323334353637383930" + "31323334";
-	public static final String CARD_ID = "1oazri721";
+	public static final String CARD_ID = "zzzzzz";
 	public static int counter = 0;
 	
 	public static long string2Long(String value) {
@@ -28,22 +27,22 @@ public class DigitCode {
 	public static String encode(long totp) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("13");
-		sb.append(String.format("%014d", calc(totp)));
+		sb.append(String.format("%010d", calc(totp)));
 		sb.append(String.format("%06d", totp));
 		return sb.toString();
 	}
 	
 	public static String decode(String value) {
 		// String prefix = value.substring(0, 2);
-		String calc = value.substring(2, 16);
-		String totp = value.substring(16);
-		String subTotp = totp + totp;
+		String calc = value.substring(2, 12);
+		String totp = value.substring(12);
+		String subTotp = totp + totp.substring(0, 2);
 		long v = Long.valueOf(calc) - Long.valueOf(subTotp);
 		String code = String.valueOf(v);
 		if (Long.valueOf(totp) % 2 == 0) {
 			code = new StringBuilder(v + "").reverse().toString();
 		}
-		return String.format("%016d", Long.valueOf(code));
+		return String.format("%010d", Long.valueOf(code));
 	}
 	
 	public static long calc(long totp) {
@@ -51,7 +50,7 @@ public class DigitCode {
 		if (totp% 2 == 0) {
 			cardId = Long.parseLong(new StringBuilder(cardId+"").reverse().toString());
 		}
-		return cardId + Long.valueOf(String.format("%06d", totp) + String.format("%06d", totp));
+		return cardId + Long.valueOf(String.format("%06d", totp) + String.format("%06d", totp).substring(0, 2));
 	}
 	
 	public static void main(String[] args) throws Exception{
@@ -62,11 +61,11 @@ public class DigitCode {
 			System.out.println(String.format("%06d", totp));
 			Thread.sleep(sleep);
 			String encode = encode(totp);
-			System.err.println("encode: " + encode.substring(0, 4) + " " + encode.substring(4, 8) + " " + encode.substring(8, 12) + " " + encode.substring(12, 16) + " " + encode.substring(16));
+			System.err.println("encode: " + encode.substring(0, 4) + " " + encode.substring(4, 8) + " " + encode.substring(8, 12) + " " + encode.substring(12));
 			Thread.sleep(sleep);
 			String decode = decode(encode);
 			System.out.println("decode: " + decode);
-			if (!decode.equals(String.format("%016d", Long.parseLong(CARD_ID, 36)))) {
+			if (!decode.equals(String.format("%010d", Long.parseLong(CARD_ID, 36)))) {
 				counter++;
 			}
 			System.out.println("-----------------------------------");
