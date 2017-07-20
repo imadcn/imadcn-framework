@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.imadcn.framework.rdb.dao.ExamReportDao">
+	
+	<!-- 添加知康体检订单附属表 -->
+	<insert id="insert" parameterType="com.imadcn.framework.rdb.domain.ExamReport">
+		INSERT INTO pe_zk_exam_report (orderId) VALUES (#{orderId})
+	</insert>
+</mapper>
