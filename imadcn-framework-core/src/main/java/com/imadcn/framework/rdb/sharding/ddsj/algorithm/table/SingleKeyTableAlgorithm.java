@@ -34,7 +34,8 @@ public class SingleKeyTableAlgorithm implements SingleKeyTableShardingAlgorithm<
 	}
 
 	private String getShardingTable(String value) {
-		long num = Long.valueOf(value);
+		int length = value.length();
+		long num = Long.valueOf(value.substring(length-10)) + 1 ;
 		return String.valueOf(num % 10);
 	}
 

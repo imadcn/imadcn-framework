@@ -89,7 +89,7 @@
 		<!-- captcha -->
 		<com.github.penggle.kaptcha.version>2.3.2</com.github.penggle.kaptcha.version>
 		<!-- sharding jdbc -->
-		<com.dangdang.sharding-jdbc.version>1.1.0</com.dangdang.sharding-jdbc.version>
+		<com.dangdang.sharding-jdbc.version>1.4.2</com.dangdang.sharding-jdbc.version>
 		<!-- redisson -->
 		<org.redisson.version>2.2.9</org.redisson.version>
 		<!-- elastic-job -->

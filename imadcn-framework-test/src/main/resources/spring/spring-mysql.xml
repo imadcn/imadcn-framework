@@ -16,13 +16,13 @@
 		<property name="password" value="${db1.jdbc.password}" />
 	</bean>
 
-	<bean id="db_node_2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+<!-- 	<bean id="db_node_2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${db2.jdbc.driverClassName}" />
 		<property name="url" value="${db2.jdbc.url}" />
 		<property name="username" value="${db2.jdbc.username}" />
 		<property name="password" value="${db2.jdbc.password}" />
 	</bean>
-
+ -->
 	<!-- <bean id="db_node_3" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> <property name="driverClassName" value="${db3.jdbc.driverClassName}"/> <property name="url" value="${db3.jdbc.url}"/> <property name="username" value="${db3.jdbc.username}"/> <property name="password" value="${db3.jdbc.password}"/> </bean> <bean id="db_node_4" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> <property name="driverClassName" value="${db4.jdbc.driverClassName}"/> 
 		<property name="url" value="${db4.jdbc.url}"/> <property name="username" value="${db4.jdbc.username}"/> <property name="password" value="${db4.jdbc.password}"/> </bean> -->
 
@@ -31,15 +31,16 @@
 	<!-- 分库策略 -->
 	<!-- <rdb:strategy id="orderDatabaseStrategy" sharding-columns="orderId" algorithm-class="com.imadcn.framework.rdb.sharding.ddsj.algorithm.database.SingleKeyDatabaseAlgorithm"/> -->
 	<!-- sharding datasource -->
+	
 	<rdb:data-source id="shardingDataSource">
-		<rdb:sharding-rule data-sources="db_node_1">
+		<rdb:sharding-rule data-sources="db_node_1" default-data-source="db_node_1">
 			<rdb:table-rules>
-				<rdb:table-rule logic-table="pe_zk_exam_report" actual-tables="pe_zk_exam_report_${0..9}" table-strategy="orderTableStrategy" />
+				<rdb:table-rule logic-table="pe_zk_exam_report" actual-tables="pe_zk_exam_report_${1..10}" table-strategy="orderTableStrategy" />
 			</rdb:table-rules>
 			<rdb:default-database-strategy sharding-columns="none" algorithm-class="com.dangdang.ddframe.rdb.sharding.api.strategy.database.NoneDatabaseShardingAlgorithm"/>
 		</rdb:sharding-rule>
 	</rdb:data-source>
-
+	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="com.imadcn.framework.rdb.dao" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
@@ -47,7 +48,12 @@
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="shardingDataSource" />
-		<property name="mapperLocations" value="classpath:sql-map/mapper/*.xml" />
+		<property name="mapperLocations" value="classpath:sql-map/mapper/**.xml" />
 	</bean>
+	
+<!-- 	<bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="db_node_1" />
+		<property name="mapperLocations" value="classpath:sql-map/mapper/normal/*.xml" />
+	</bean> -->
 	
 </beans>
