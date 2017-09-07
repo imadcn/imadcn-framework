@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,7 +23,9 @@ public class RedisLockManager implements InitializingBean {
 	private final UUID uuid = UUID.randomUUID();
 	
 	protected String id;
+	@Autowired(required = false)
 	private RedisTemplate<Object, Object> redisTemplate;
+	@Autowired(required = false)
 	private RedisMessageListenerContainer container;
 	private volatile MessageListener messageListener;
 	private String groupName; // 功能组名

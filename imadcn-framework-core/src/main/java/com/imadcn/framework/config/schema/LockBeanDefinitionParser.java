@@ -25,15 +25,19 @@ public class LockBeanDefinitionParser extends AbstractSingleBeanDefinitionParser
 		if (!StringUtils.hasText(group)) {
 			throw new IllegalArgumentException("redis lock group name should not be null");
 		}
-		if (!StringUtils.hasText(redisTemplate)) {
-			throw new IllegalArgumentException("redis template should not be null");
-		}
-		if (!StringUtils.hasText(messageContainer)) {
-			throw new IllegalArgumentException("redis message listener container should not be null");
-		}
+//		if (!StringUtils.hasText(redisTemplate)) {
+//			throw new IllegalArgumentException("redis template should not be null");
+//		}
+//		if (!StringUtils.hasText(messageContainer)) {
+//			throw new IllegalArgumentException("redis message listener container should not be null");
+//		}
 		builder.addPropertyValue("id", StringUtils.hasText(id) ? id : "redisLockManager" + new Random().nextInt(100));
 		builder.addPropertyValue("groupName", group);
-		builder.addPropertyReference("redisTemplate", redisTemplate);
-		builder.addPropertyReference("container", messageContainer);
+		if (StringUtils.hasText(redisTemplate)) {
+			builder.addPropertyReference("redisTemplate", redisTemplate);
+		}
+		if (StringUtils.hasText(messageContainer)) {
+			builder.addPropertyReference("container", messageContainer);
+		}
 	}
 }

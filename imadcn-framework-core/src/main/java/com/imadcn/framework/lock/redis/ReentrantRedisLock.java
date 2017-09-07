@@ -199,7 +199,7 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	public boolean isLocked() { 
 		Boolean execute = redisTemplate.execute(new RedisCallback<Boolean>() {
 			public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
-				Long eval = connection.eval(serializeScript(CHECK_LOCKED_SCRIPT), ReturnType.INTEGER, 1, serializeParams(getRedisKey(), getHashField()));
+				Long eval = connection.eval(serializeScript(CHECK_LOCKED_SCRIPT), ReturnType.INTEGER, 1, serializeParams(getRedisKey()));
 				if (eval == 1) { 
 					return Boolean.TRUE;
 				} else {
@@ -391,9 +391,9 @@ public class ReentrantRedisLock implements RedisLock, Serializable  {
 	 */
 	private static final String CHECK_LOCKED_SCRIPT = 
 										"if (redis.call('exists', KEYS[1]) == 0) then " +
-									        "return 1; " + 
+									        "return 0; " + 
 									    "else " + 
-									        "return 0; "+
+									        "return 1; "+
 									    "end;";
 	
 	/**
