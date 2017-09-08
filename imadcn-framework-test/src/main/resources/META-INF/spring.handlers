@@ -1,2 +1,2 @@
-http\://code.imadcn.com/schema/overwatch=com.imadcn.framework.config.spring.schema.OverwatchNamespaceHandler
-http\://code.imadcn.com/schema/lock=com.imadcn.framework.config.spring.schema.LockNamespaceHandler
+http\://code.imadcn.com/schema/overwatch=com.imadcn.framework.config.schema.OverwatchNamespaceHandler
+http\://code.imadcn.com/schema/lock=com.imadcn.framework.config.schema.LockNamespaceHandler
