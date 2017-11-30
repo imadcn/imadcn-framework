@@ -6,4 +6,4 @@
 - **分布式锁**  https://github.com/imadcn/redislock
 - **开发工具集**  https://github.com/imadcn/common
 - **分布式统一ID生成工具**  https://github.com/imadcn/idworker
-- **dubbo拓展**  https://github.com/imadcn/duubo-extension
+- **dubbo拓展**  https://github.com/imadcn/dubbo-extension
